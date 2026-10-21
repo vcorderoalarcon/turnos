@@ -1,4 +1,21 @@
-<meta name="claude:viewport-fit-sides" content="cover">
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+/* Base equivalente a la que aporta el visor de Claude, para que el sitio
+   propio se vea igual: respeta las barras del sistema y parte sin márgenes. */
+:root{
+  color-scheme: light;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html, body { height: 100%; }
+body { margin: 0; font-size: 14px; -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
 <title>Turnos</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0F4634">
@@ -342,7 +359,8 @@ textarea{ min-height:110px; resize:vertical; line-height:1.45; font-family:ui-mo
 .empty h2{ font-size:19px; margin-bottom:6px; }
 .empty p{ margin:0 auto 16px; max-width:34em; font-size:13.5px; color:var(--fg-2); }
 </style>
-
+</head>
+<body>
 <div id="app"></div>
 
 <script>
@@ -2217,3 +2235,5 @@ if(APP_PROPIA && navigator.serviceWorker){
 }
 })();
 </script>
+</body>
+</html>
