@@ -4,13 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
-/* Base equivalente a la que aporta el visor de Claude, para que el sitio
-   propio se vea igual: respeta las barras del sistema y parte sin márgenes. */
-:root{
-  color-scheme: light;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
+:root{ color-scheme: light; padding-top: env(safe-area-inset-top,0px); padding-bottom: env(safe-area-inset-bottom,0px); }
 html, body { height: 100%; }
 body { margin: 0; font-size: 14px; -webkit-text-size-adjust: 100%; }
 img { max-width: 100%; }
@@ -355,6 +349,30 @@ textarea{ min-height:110px; resize:vertical; line-height:1.45; font-family:ui-mo
 .acciones{ display:flex; flex-direction:column; gap:9px; width:min(330px,100%); }
 .inicio-foot{ display:flex; flex-direction:column; align-items:center; gap:2px; margin-top:2px; }
 .inicio-foot small{ font-size:11.5px; color:var(--fg-3); letter-spacing:.03em; }
+
+/* ---------- quiénes somos ---------- */
+.qs{ background:var(--surface-2); }
+.qs .gut{ padding-block:24px; padding-bottom:calc(30px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:26px; }
+.qs section{ display:flex; flex-direction:column; gap:12px; }
+.qs .eyebrow{ color:var(--orange-ink); }
+.qs h2{ margin:0; font-family:var(--display); font-size:clamp(25px,7.4vw,31px); font-weight:600; line-height:1.16; letter-spacing:-0.012em; color:var(--par-ink); }
+.qs p{ margin:0; font-size:13.5px; line-height:1.7; color:var(--fg); }
+.qs-logo{ width:min(196px,56vw); align-self:flex-start; margin-bottom:2px; }
+.qs-stats{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.qs-stat{ background:var(--bg); border-radius:14px; padding:14px 13px 15px; min-width:0; }
+.qs-stat b{ display:block; font-family:var(--display); font-size:27px; font-weight:600; line-height:1; color:var(--par-ink); font-variant-numeric:tabular-nums; }
+.qs-stat span{ display:block; margin-top:6px; font-size:11.5px; line-height:1.4; color:var(--fg-2); }
+.qs-def > div{ padding:15px 0 16px; border-top:1px solid var(--line); }
+.qs-def > div:first-child{ border-top:0; padding-top:4px; }
+.qs-def h3{ margin:0 0 5px; font-family:var(--display); font-size:15.5px; font-weight:600; line-height:1.3; color:var(--par-ink); }
+.qs-def p{ font-size:12.5px; line-height:1.65; color:var(--fg-2); }
+.qs-limites{ background:var(--bg); border-radius:16px; padding:18px 16px 20px; display:flex; flex-direction:column; gap:12px; }
+.qs-limites > div{ display:flex; gap:10px; align-items:flex-start; }
+.qs-limites i{ flex:none; width:6px; height:6px; margin-top:7px; border-radius:999px; background:var(--orange); }
+.qs-limites p{ font-size:12.5px; line-height:1.6; }
+.qs-pie{ display:flex; flex-direction:column; gap:3px; align-items:center; padding-top:4px; text-align:center; }
+.qs-pie b{ font-family:var(--body); font-size:14px; font-weight:600; letter-spacing:.2em; text-indent:.2em; color:var(--par-ink); }
+.qs-pie small{ font-size:11.5px; color:var(--fg-2); }
 
 .empty{ text-align:center; padding:28px 8px; }
 .empty h2{ font-size:19px; margin-bottom:6px; }
@@ -1002,43 +1020,59 @@ function vistaQuienes(){
     '<div style="font-size:12px;color:var(--on-navy-2)">Turnos · Savia Educa</div></div>' +
     '</div></div></header>';
 
-  s += '<div class="page"><div class="gut">';
-  s += '<section class="card" style="text-align:center"><div class="logo-card" style="width:min(225px,62vw);margin:2px auto 14px">' +
-    '<img src="' + LOGO + '" alt="Savia Educa"></div>' +
-    '<span class="regla" style="margin:0 auto 12px"></span>' +
-    '<div class="wordmark-sm">TURNOS</div>' +
-    '<p class="dato" style="margin-top:7px">Registro de interacciones de aula<br>Desarrollada por Savia Educa</p></section>';
+  s += '<div class="qs"><div class="gut">';
 
-  function bloque(t, parrafos){
-    return '<section class="card"><h3>' + h(t) + '</h3>' +
-      parrafos.map(function(x){ return '<p class="dato" style="font-size:13px;line-height:1.6">' + x + '</p>'; }).join("") + '</section>';
-  }
+  s += '<section>' +
+    '<img class="qs-logo" src="' + LOGO + '" alt="Savia Educa">' +
+    '<span class="eyebrow">Quiénes somos</span>' +
+    '<h2>Un registro nacido en aula chilena.</h2>' +
+    '<p>Turnos no es un modelo importado. Nace de una pregunta que cualquier profesor se hace al terminar la clase: quién participó, quién no, y qué estaba haciendo el que no participó.</p>' +
+    '<p>El libro de clases guarda la nota y la anotación, o sea el resultado y la falta. Lo que pasa en el medio no lo guarda nadie. Turnos produce ese insumo, que es previo a la nota y previo a la anotación.</p>' +
+    '</section>';
 
-  s += bloque("Qué es", ["Una app web que corre en el teléfono del profesor durante la clase. Un archivo, sin servidor y sin cuenta: los datos quedan en el dispositivo de cada profesor."]);
-  s += bloque("Qué problema resuelve", ["Entre lo que pasa en la clase y lo que queda registrado hay un vacío. El libro de clases guarda notas y anotaciones: el resultado y la falta. Nadie guarda quién participó, quién no, y qué hacía el que no participaba. Turnos produce ese insumo, que es previo a la nota y previo a la anotación."]);
-  s += bloque("Quién la usa", ["El profesor de asignatura, solo, en su teléfono, mientras hace clases. Admite varios cursos. Cualquier profesor la carga con sus propios cursos."]);
-  s += bloque("Objetivo", ["Tomar decisiones pedagógicas con evidencia en vez de impresión: a quién preguntar la próxima clase, quién termina rápido pero equivocado, en qué fase se cae la clase, y qué tan parejo reparte el profesor sus turnos."]);
-  s += bloque("Cómo funciona", [
-    "Registrar toma dos toques: el estudiante, luego la acción. Hay 29 acciones en cuatro familias, nombradas por la conducta concreta y agrupadas por color. Cada registro guarda la fase de la clase, si era trabajo grupal, y el puesto.",
-    "Durante la clase hay una franja viva con el 10% del curso que menos ha participado, que se reordena sola cada vez que registras. En las fases de trabajo hay un barrido de la práctica autónoma, con cuatro estados y un toque por estudiante.",
-    "Al cerrar la clase se completan las descripciones pendientes, aparece el resumen y queda armada la lista para la clase siguiente.",
-    "El consolidado, por semana o por mes, entrega: quiénes más y menos participan, la concentración de turnos, el desglose de fuera de tarea, el mapa de calor por puesto, el resultado de los barridos, la correspondencia con el reglamento interno del establecimiento y la evidencia para sus reconocimientos. Todo exportable a Excel.",
-    "Hay además una vista para proyectar al curso, con meta colectiva y reconocimientos, sin ranking ni conteos individuales."
-  ]);
-  s += bloque("En qué se basa", [
-    "Ninguna categoría de Turnos es una ocurrencia. Cada decisión de diseño viene de una línea de investigación declarada.",
-    "La distinción entre participación voluntaria y participación por llamada directa viene de Flanders y su sistema de análisis de la interacción. Las categorías de fuera de tarea y el muestreo por intervalos en vez de censo, de Shapiro y el instrumento BOSS. Tratar la interacción del profesor como objeto de medición propio, de Pianta y Hamre. Las categorías de trabajo entre pares y el indicador de ayuda aplicada, de Webb y Nelson-Le Gall, que distinguen pedir la respuesta de pedir una explicación. La decisión de no usar «trabajan juntos» como categoría, de Mercer y sus tres tipos de habla. La familia de movimientos del profesor, de Michaels, O’Connor y Resnick. El registro de solo las dimensiones observables del engagement, de Fredricks, Blumenfeld y Paris. El mapa de calor por puesto y, sobre todo, lo que ese mapa no permite concluir, de Adams y Biddle, Sommer, Koneya y Daum.",
-    "El marco normativo es chileno: el Decreto 67/2018 establece que no toda evaluación conduce a calificación, lo que sostiene que estos datos no entren en la nota. La correspondencia con faltas y con reconocimientos se configura según el reglamento interno de cada establecimiento."
-  ]);
-  s += bloque("Límites que la plataforma declara", [
-    "Registra conducta observable. No infiere engagement emocional ni cognitivo.",
-    "Es muestreo, no censo. Los conteos dependen de cuánto registró el profesor, y eso va impreso en el consolidado.",
-    "No determina faltas. El reglamento interno exige registro en la hoja de vida y debido proceso.",
-    "El mapa de sala muestra dónde pasó, no que el puesto lo cause.",
-    "Hubo una corrección durante el diseño: la razón 4:1 de elogios por reprimenda, que suele citarse como norma, no resistió el examen. Una revisión sistemática halló tasas inconsistentes y un análisis sobre 151 salas no encontró umbral. Turnos mide el elogio específico de conducta, que sí tiene respaldo, y no persigue una razón.",
-    "Los datos son locales. No se sincronizan entre dispositivos. Savia Educa no los recibe, no los almacena y no puede recuperarlos si el dispositivo se pierde."
-  ]);
+  s += '<section><div class="qs-stats">' +
+    [[ACCIONES.length, "acciones de aula, nombradas por la conducta concreta"],
+     [FAMILIAS.length, "familias, según qué sostiene la conducta"],
+     ["2", "toques para registrar a un estudiante"],
+     ["0", "datos en servidores: todo vive en tu teléfono"]]
+    .map(function(x){ return '<div class="qs-stat"><b>' + x[0] + '</b><span>' + h(x[1]) + '</span></div>'; }).join("") +
+    '</div></section>';
 
+  s += '<section>' +
+    '<span class="eyebrow">Cómo funciona</span>' +
+    '<p>Registrar toma dos toques: el estudiante, y después la acción. Cada registro guarda solo la fase de la clase, si era trabajo grupal y el puesto.</p>' +
+    '<p>Durante la clase hay una franja viva con el diez por ciento del curso que menos ha participado, que se reordena sola cada vez que registras. En las fases de trabajo puedes barrer la práctica con un toque por estudiante.</p>' +
+    '<p>Al cerrar, completas lo que quedó pendiente y la app arma la lista para la clase siguiente. El consolidado, por semana o por mes, agrupa al curso por lo que corresponde hacer con cada grupo, no por si la conducta fue buena o mala.</p>' +
+    '</section>';
+
+  s += '<section>' +
+    '<span class="eyebrow">En qué se basa</span>' +
+    '<h2>Ninguna categoría es una ocurrencia.</h2>' +
+    '<div class="qs-def">' +
+    [["Flanders", "La distinción entre participar por decisión propia y responder cuando el profesor llama. Su sistema de análisis de la interacción lleva más de cinco décadas separando ambas cosas."],
+     ["Shapiro, instrumento BOSS", "Las categorías de fuera de tarea divididas en motor, verbal y pasivo, y la decisión de muestrear en vez de intentar un censo imposible."],
+     ["Pianta y Hamre", "Tratar la interacción del profesor como objeto de medición propio, y no como el telón de fondo de la del estudiante."],
+     ["Webb y Nelson-Le Gall", "Pedir la respuesta y pedir una explicación no son lo mismo. Y lo que más predice el aprendizaje no es recibir ayuda, sino si quien la recibe la aplica."],
+     ["Mercer", "Por qué «trabajan juntos» no sirve como categoría: hay trabajo grupal improductivo que se ve perfectamente ordenado."],
+     ["Michaels, O’Connor y Resnick", "El catálogo de movimientos del profesor durante la discusión, y el patrón por defecto que conviene romper."],
+     ["Fredricks, Blumenfeld y Paris", "El compromiso tiene dimensiones que no se observan. Turnos registra solo las que sí, y lo dice en pantalla."],
+     ["Adams y Biddle, Koneya, Daum", "El mapa de calor por puesto y, sobre todo, lo que ese mapa no permite concluir sobre el efecto del asiento."],
+     ["Decreto 67/2018", "No toda evaluación conduce a calificación. Ese es el respaldo normativo de que estos datos no entren en la nota."]]
+    .map(function(x){ return '<div><h3>' + h(x[0]) + '</h3><p>' + h(x[1]) + '</p></div>'; }).join("") +
+    '</div></section>';
+
+  s += '<section>' +
+    '<span class="eyebrow">Qué no hace</span>' +
+    '<div class="qs-limites">' +
+    ["Registra conducta observable. No infiere lo que el estudiante siente ni lo que piensa.",
+     "Es muestreo, no censo. Los conteos dependen de cuánto alcanzaste a registrar, y eso va impreso en el consolidado.",
+     "No determina faltas. El reglamento interno de cada establecimiento exige su propio registro y su debido proceso.",
+     "El mapa de sala muestra dónde pasó, no que el puesto lo haya causado.",
+     "Los datos son locales y no se sincronizan. Savia Educa no los recibe, no los almacena y no puede recuperarlos si pierdes el dispositivo."]
+    .map(function(x){ return '<div><i></i><p>' + h(x) + '</p></div>'; }).join("") +
+    '</div></section>';
+
+  s += '<div class="qs-pie"><b>TURNOS</b><small>Desarrollada por Savia Educa</small></div>';
   s += '<button type="button" class="btn ghost wide" data-act="ir" data-v="inicio">Volver</button>';
   s += '</div></div>';
   return s;
