@@ -23,7 +23,8 @@ img { max-width: 100%; }
 <meta name="apple-mobile-web-app-title" content="Turnos">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="icono-180.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500..700&family=Work+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400..700&display=swap">
 <style>
 /* Layout: una columna en el teléfono, cabecera fija con la fase, grilla del curso de 4 columnas,
    hoja de acciones por familia, y una vista aparte de ancho completo para proyectar. */
@@ -388,6 +389,7 @@ var FAMILIAS = [
 var ACCIONES = [
   {id:"p-vol",      f:"par", t:"Levanta la mano y participa",      k:"voluntaria", s:1},
   {id:"p-dir-ok",   f:"par", t:"Lo llamo y responde bien",         k:"llamada",    s:1},
+  {id:"p-sin-mano", f:"par", t:"Responde sin levantar la mano",    k:"voluntaria", s:0},
   {id:"p-vol-err",  f:"par", t:"Participa y se equivoca",          k:"voluntaria", s:1, mc:true},
   {id:"p-preg",     f:"par", t:"Pregunta sobre el contenido",      k:"voluntaria", s:1, mc:true},
   {id:"p-idea",     f:"par", t:"Aporta una idea o argumenta",      k:"voluntaria", s:1},
@@ -430,7 +432,9 @@ var BARRIDO = [
   { id:"no",  t:"No empezó",         g:"○", tok:"no" }
 ];
 var BAR_BY_ID = {}; BARRIDO.forEach(function(b){ BAR_BY_ID[b.id] = b; });
-var FASES_BARRIDO = { independiente:true, guiada:true };
+/* Donde los estudiantes producen algo que se puede mirar. Queda fuera
+   Modelamiento, que es el profesor enseñando. */
+var FASES_BARRIDO = { entrada:true, guiada:true, independiente:true, salida:true };
 
 var ACC_BY_ID = {}; ACCIONES.forEach(function(a){ ACC_BY_ID[a.id] = a; });
 var FAM_BY_ID = {}; FAMILIAS.forEach(function(f){ FAM_BY_ID[f.id] = f; });
@@ -464,7 +468,7 @@ function nuevoDB(){
   return {
     v:1, cursos:[], cursoActivo:null, registros:[], clases:[], barridos:[],
     semanas:{},
-    config:{ mostrarInicio:true, vistaCurso:true, reconocimientos:true, meta:250, etiquetaPrincipal:"Matemático de la semana", etiquetas:{}, ultimoRespaldo:null }
+    config:{ mostrarInicio:true, ordenNomina:"apellidos", formatoCorto:"nombre", vistaCurso:true, reconocimientos:true, meta:250, etiquetaPrincipal:"Matemático de la semana", etiquetas:{}, ultimoRespaldo:null }
   };
 }
 function cargar(){
@@ -485,6 +489,7 @@ function normalizar(d){
   return d;
 }
 function guardar(){
+  _cortos = null;
   try{ localStorage.setItem(KEY, JSON.stringify(DB)); }
   catch(e){ toast("No se pudo guardar en este navegador. Copia un respaldo desde Ajustes.", null); }
 }
@@ -516,17 +521,89 @@ function rangoSemana(base){
   if(lun.getMonth() === vie.getMonth()) return "Semana del " + lun.getDate() + " al " + vie.getDate() + " de " + m[vie.getMonth()];
   return "Semana del " + lun.getDate() + " de " + m[lun.getMonth()] + " al " + vie.getDate() + " de " + m[vie.getMonth()];
 }
-function corto(nombre){
-  var n = String(nombre).replace(/\s+/g," ").trim();
+/* "De la Fuente" es un apellido, no tres. Estas partículas se pegan a la
+   palabra siguiente para que cuenten como una sola unidad. */
+var PARTICULAS = { de:1, del:1, la:1, las:1, los:1, da:1, das:1, do:1, dos:1,
+                   van:1, von:1, di:1, du:1, san:1, santa:1, santo:1, mac:1, mc:1 };
+function unidades(tokens){
+  var u = [], buf = [];
+  for(var i = 0; i < tokens.length; i++){
+    buf.push(tokens[i]);
+    if(PARTICULAS[tokens[i].toLowerCase()] && i < tokens.length - 1) continue;
+    u.push(buf.join(" ")); buf = [];
+  }
+  if(buf.length) u.push(buf.join(" "));
+  return u;
+}
+
+/* Separa un nombre en apellidos y nombres. Sin coma hay que suponer el orden,
+   y eso lo decide el profesor en Ajustes viendo su propia nómina. */
+function partesNombre(nombre){
+  var n = String(nombre||"").replace(/\s+/g," ").trim();
+  if(!n) return { no:[], ap:[] };
   if(n.indexOf(",") > -1){
     var pp = n.split(",");
-    var ap = (pp[0]||"").trim().split(" ")[0] || "";
-    var no = (pp[1]||"").trim().split(" ")[0] || "";
-    return (no + (ap ? " " + ap.charAt(0).toUpperCase() + "." : "")).trim() || n;
+    return { full:n, ap:unidades((pp[0]||"").trim().split(" ").filter(Boolean)),
+             no:unidades((pp[1]||"").trim().split(" ").filter(Boolean)) };
   }
-  var t = n.split(" ");
-  if(t.length === 1) return t[0];
-  return t[0] + " " + t[1].charAt(0).toUpperCase() + ".";
+  var t = unidades(n.split(" ").filter(Boolean));
+  if(t.length === 1) return { full:n, no:[t[0]], ap:[] };
+  if((DB && DB.config && DB.config.ordenNomina) === "nombres"){
+    var nn = t.length >= 4 ? 2 : 1;
+    return { full:n, no:t.slice(0,nn), ap:t.slice(nn) };
+  }
+  var na = t.length >= 3 ? 2 : 1;
+  return { full:n, ap:t.slice(0,na), no:t.slice(na) };
+}
+function inicial(s){ return s ? s.charAt(0).toUpperCase() + "." : ""; }
+/* Las nóminas de LIRMI vienen en mayúsculas; en las fichas eso se ve gritado.
+   Solo se normaliza lo que viene todo en mayúsculas: lo escrito a mano se respeta. */
+function cap(s){
+  if(!s) return "";
+  if(s !== s.toUpperCase()) return s;
+  return s.toLowerCase().split(" ").map(function(w, i){
+    return (i > 0 && PARTICULAS[w]) ? w : w.charAt(0).toUpperCase() + w.slice(1);
+  }).join(" ");
+}
+/* nivel 0 es la forma breve; si dos estudiantes chocan, suben de nivel
+   hasta distinguirse. Así los tres Díaz nunca se ven iguales. */
+function formaCorta(p, nivel){
+  if(nivel >= 3) return cap(p.full || "");
+  var A = cap(p.ap[0] || ""), N = cap(p.no[0] || "");
+  if((DB && DB.config && DB.config.formatoCorto) === "apellido"){
+    if(nivel === 0) return (A + " " + inicial(N)).trim();
+    if(nivel === 1) return (A + " " + N).trim();
+    return (A + " " + N + " " + inicial(p.no[1])).trim();
+  }
+  if(nivel === 0) return (N + " " + inicial(A)).trim();
+  if(nivel === 1) return (N + " " + A).trim();
+  return (N + " " + A + " " + inicial(p.ap[1])).trim();
+}
+function calcularCortos(c){
+  var lista = alumnosDe(c).map(function(a){ return { n:a.nombre, p:partesNombre(a.nombre) }; });
+  var nivel = {};
+  lista.forEach(function(x){ nivel[x.n] = 0; });
+  for(var paso = 0; paso < 4; paso++){
+    var cuenta = {}, hubo = false;
+    lista.forEach(function(x){ var f = formaCorta(x.p, nivel[x.n]); cuenta[f] = (cuenta[f]||0)+1; });
+    lista.forEach(function(x){
+      if(cuenta[formaCorta(x.p, nivel[x.n])] > 1 && nivel[x.n] < 3){ nivel[x.n]++; hubo = true; }
+    });
+    if(!hubo) break;
+  }
+  var m = {};
+  lista.forEach(function(x){ m[x.n] = formaCorta(x.p, nivel[x.n]) || x.n; });
+  return m;
+}
+var _cortos = null;
+function corto(nombre){
+  var c = curso();
+  if(c){
+    if(!_cortos || _cortos.id !== c.id) _cortos = { id:c.id, m:calcularCortos(c) };
+    if(_cortos.m[nombre]) return _cortos.m[nombre];
+  }
+  var p = partesNombre(nombre);
+  return formaCorta(p, 0) || String(nombre||"");
 }
 
 /* ========== acceso a datos ========== */
@@ -1654,6 +1731,8 @@ function vistaConfig(c){
     s += '<div class="btn-row" style="margin-top:12px"><button type="button" class="btn sm accent" data-act="modal" data-m="nuevo-curso">Agregar curso</button></div></section>';
   }
 
+  if(c && alumnosDe(c).length) s += tarjetaNombres(c);
+
   if(c && alumnosDe(c).length){
     s += '<section class="card"><h3>Consolidado</h3>' +
       '<div class="sub">Quién participa, quién no aparece, quién no inicia la tarea, por semana o por mes</div>' +
@@ -1723,6 +1802,32 @@ function vistaConfig(c){
   s += '</div></div>';
   return s;
 }
+function tarjetaNombres(c){
+  function seg(etiqueta, accion, valor, opciones){
+    var r = '<div class="eyebrow" style="color:var(--fg-2);margin-bottom:7px">' + h(etiqueta) + '</div>' +
+      '<div class="seg" role="group" aria-label="' + h(etiqueta) + '">';
+    opciones.forEach(function(o){
+      r += '<button type="button" aria-pressed="' + (valor === o.v ? "true" : "false") +
+        '" data-act="' + accion + '" data-v="' + o.v + '">' + h(o.t) + '</button>';
+    });
+    return r + '</div>';
+  }
+  var s = '<section class="card"><h3>Cómo se muestran los nombres</h3>' +
+    '<div class="sub">En la grilla no cabe el nombre completo. Elige la forma corta mirando tu propia nómina.</div>';
+  s += seg("Orden en que viene tu nómina", "orden", DB.config.ordenNomina === "nombres" ? "nombres" : "apellidos",
+    [{ v:"apellidos", t:"Apellidos primero" }, { v:"nombres", t:"Nombres primero" }]);
+  s += '<div style="height:14px"></div>';
+  s += seg("Forma corta", "formato", DB.config.formatoCorto === "apellido" ? "apellido" : "nombre",
+    [{ v:"nombre", t:"Nombre + inicial" }, { v:"apellido", t:"Apellido + inicial" }]);
+  s += '<div style="margin-top:15px"><div class="eyebrow" style="color:var(--fg-2);margin-bottom:5px">Así queda tu curso</div>';
+  alumnosDe(c).slice(0, 4).forEach(function(a){
+    s += '<div class="row"><span style="flex:1;min-width:0;font-size:12px;color:var(--fg-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' +
+      h(a.nombre) + '</span><b style="flex:none;font-size:13.5px">' + h(corto(a.nombre)) + '</b></div>';
+  });
+  s += '</div><p class="dato">Si dos estudiantes quedan con la misma forma corta, la app alarga la de ambos hasta distinguirlos.</p>';
+  return s + '</section>';
+}
+
 function toggle(key, titulo, sub, on){
   return '<div class="toggle-row"><div><b>' + h(titulo) + '</b><small>' + h(sub) + '</small></div>' +
     '<button type="button" class="sw2" role="switch" aria-checked="' + (on?"true":"false") + '" aria-label="' + h(titulo) + '" data-act="toggle" data-k="' + key + '"><i></i></button></div>';
@@ -2105,6 +2210,8 @@ document.addEventListener("click", function(ev){
   if(act === "grupal"){ var cl3 = asegurarClase(); cl3.grupal = !cl3.grupal; guardar(); render(); return; }
   if(act === "set-curso"){ DB.cursoActivo = id; guardar(); modal = null; vista = "clase"; render(); window.scrollTo(0,0); return; }
   if(act === "toggle"){ var k = t.getAttribute("data-k"); DB.config[k] = !DB.config[k]; guardar(); render(); return; }
+  if(act === "orden"){ DB.config.ordenNomina = t.getAttribute("data-v"); guardar(); render(); return; }
+  if(act === "formato"){ DB.config.formatoCorto = t.getAttribute("data-v"); guardar(); render(); return; }
 
   if(act === "crear-curso"){
     var nomC = val("f-nombre").trim();
