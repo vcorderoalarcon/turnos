@@ -1,0 +1,2219 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Turnos</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0F4634">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Turnos">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icono-180.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500..700&family=Work+Sans:wght@400..700&display=swap">
+<style>
+/* Layout: una columna en el teléfono, cabecera fija con la fase, grilla del curso de 4 columnas,
+   hoja de acciones por familia, y una vista aparte de ancho completo para proyectar. */
+:root{
+  --bg:#FBFAF7; --surface:#FFFFFF; --surface-2:#E3EDE7; --line:#D6E0D9;
+  --fg:#1F2421; --fg-2:#6E6A5F; --fg-3:#8A8578;
+  --navy:#0F4634; --navy-2:#0B3729; --on-navy:#FBFAF7; --on-navy-2:#B9CFC3; --on-navy-3:#93B2A2;
+  --orange:#C8952F; --on-orange:#2A1F08; --orange-ink:#7A5310; --orange-wash:#F8EEDA; --orange-line:#E7D5AE;
+  --par-wash:#E3EDE7; --par-ink:#0B3D2D; --par-dot:#17604A;
+  --fdt-wash:#F8EEDA; --fdt-ink:#7A5310; --fdt-dot:#A8741A;
+  --doc-wash:#F7E8ED; --doc-ink:#76283F; --doc-dot:#9B3F5C;
+  --pares-wash:#E2EFF7; --pares-ink:#154E74; --pares-dot:#1E6FA3;
+  --danger:#A32B22; --band:#0F4634;
+  --verde:#0F4634; --verde-ink:#0F4634; --verde-btn:#0F4634; --on-verde:#FBFAF7;
+  --heat-rgb:15,70,52; --heat-hi:#FBFAF7; --heat-lo:#1F2421;
+  --logo-bg:transparent; --logo-pad:0px; --logo-shift:-17.6%;
+  --ok-dot:#2E7D52; --ok-wash:#E3F0E8; --ok-ink:#1C5737;
+  --err-dot:#A8741A; --err-wash:#F8EEDA; --err-ink:#7A5310;
+  --av-dot:#1E6FA3; --av-wash:#E2EFF7; --av-ink:#154E74;
+  --no-dot:#8A8578; --no-wash:#EFEDE7; --no-ink:#5A564C;
+  --display:"Lora",Georgia,"Times New Roman",serif;
+  --body:"Work Sans",-apple-system,BlinkMacSystemFont,Segoe UI,system-ui,sans-serif;
+  --r:14px; --r-sm:10px; --r-lg:18px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121714; --surface:#1A211C; --surface-2:#242D26; --line:#354037;
+  --fg:#FBFAF7; --fg-2:#A9A79A; --fg-3:#8A8578;
+  --navy:#16221D; --navy-2:#1F2C25; --on-navy:#FBFAF7; --on-navy-2:#A6C2B2; --on-navy-3:#8AA897;
+  --orange:#E0B458; --on-orange:#201706; --orange-ink:#F0CE8C; --orange-wash:#33280F; --orange-line:#4A3C1E;
+  --par-wash:#16332A; --par-ink:#A7D4BE; --par-dot:#5FA886;
+  --fdt-wash:#33280F; --fdt-ink:#F0CE8C; --fdt-dot:#E0B458;
+  --doc-wash:#331F27; --doc-ink:#F0B9C9; --doc-dot:#D1819A;
+  --pares-wash:#132D3D; --pares-ink:#A9D4EE; --pares-dot:#5FA8D4;
+  --danger:#FF9A92; --band:#16221D;
+  --verde:#5FA886; --verde-ink:#8FD4B2; --verde-btn:#5FA886; --on-verde:#0A1A13;
+  --heat-rgb:111,184,148; --heat-hi:#121714; --heat-lo:#FBFAF7;
+  --logo-bg:#FBFAF7; --logo-pad:16px 20px;
+  --ok-dot:#6FC694; --ok-wash:#12301F; --ok-ink:#A8E6C2;
+  --err-dot:#E0B458; --err-wash:#33280F; --err-ink:#F0CE8C;
+  --av-dot:#5FA8D4; --av-wash:#132D3D; --av-ink:#A9D4EE;
+  --no-dot:#A9A79A; --no-wash:#242D26; --no-ink:#CFCCC1;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#121714; --surface:#1A211C; --surface-2:#242D26; --line:#354037;
+  --fg:#FBFAF7; --fg-2:#A9A79A; --fg-3:#8A8578;
+  --navy:#16221D; --navy-2:#1F2C25; --on-navy:#FBFAF7; --on-navy-2:#A6C2B2; --on-navy-3:#8AA897;
+  --orange:#E0B458; --on-orange:#201706; --orange-ink:#F0CE8C; --orange-wash:#33280F; --orange-line:#4A3C1E;
+  --par-wash:#16332A; --par-ink:#A7D4BE; --par-dot:#5FA886;
+  --fdt-wash:#33280F; --fdt-ink:#F0CE8C; --fdt-dot:#E0B458;
+  --doc-wash:#331F27; --doc-ink:#F0B9C9; --doc-dot:#D1819A;
+  --pares-wash:#132D3D; --pares-ink:#A9D4EE; --pares-dot:#5FA8D4;
+  --danger:#FF9A92; --band:#16221D;
+  --verde:#5FA886; --verde-ink:#8FD4B2; --verde-btn:#5FA886; --on-verde:#0A1A13;
+  --heat-rgb:111,184,148; --heat-hi:#121714; --heat-lo:#FBFAF7;
+  --logo-bg:#FBFAF7; --logo-pad:16px 20px;
+  --ok-dot:#6FC694; --ok-wash:#12301F; --ok-ink:#A8E6C2;
+  --err-dot:#E0B458; --err-wash:#33280F; --err-ink:#F0CE8C;
+  --av-dot:#5FA8D4; --av-wash:#132D3D; --av-ink:#A9D4EE;
+  --no-dot:#A9A79A; --no-wash:#242D26; --no-ink:#CFCCC1;
+  color-scheme:dark;
+}
+body{ background:var(--bg); color:var(--fg); font-family:var(--body); font-size:15px; line-height:1.5; }
+body::before{ content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:30; background:var(--band); }
+body[data-vista="inicio"]::before, body[data-vista="curso"]::before{ background:var(--bg); }
+*{ box-sizing:border-box; }
+h1,h2,h3{ font-family:var(--display); font-weight:700; letter-spacing:-0.012em; text-wrap:balance; margin:0; }
+button,input,textarea,select{ font:inherit; color:inherit; }
+button{ cursor:pointer; }
+:focus-visible{ outline:3px solid var(--orange); outline-offset:2px; }
+.num{ font-variant-numeric:tabular-nums; }
+.gut{ padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); }
+.eyebrow{ font-family:var(--body); font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+/* ---------- cabecera ---------- */
+.topbar{ position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--navy); color:var(--on-navy); }
+.topbar .gut{ padding-block:13px 15px; display:flex; flex-direction:column; gap:12px; }
+.toprow{ display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0; }
+.curso-pick{ display:flex; align-items:baseline; gap:8px; min-width:0; background:none; border:0; padding:0; color:var(--on-navy); text-align:left; }
+.curso-pick b{ font-family:var(--display); font-size:21px; font-weight:800; letter-spacing:-0.015em; }
+.curso-pick span{ font-size:12.5px; color:var(--on-navy-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.icon-btn{ display:flex; align-items:center; justify-content:center; width:40px; height:40px; flex:none; border:0; border-radius:999px; background:var(--navy-2); color:var(--on-navy); }
+.fase-box{ display:flex; align-items:center; gap:10px; background:var(--navy-2); border-radius:var(--r); padding:8px 8px 8px 13px; }
+.fase-now{ flex:1; min-width:0; }
+.fase-now .eyebrow{ color:var(--on-navy-3); }
+.fase-btn{ display:flex; align-items:center; gap:6px; margin-top:1px; padding:0; border:0; background:none; color:var(--on-navy); font-family:var(--display); font-size:16px; font-weight:700; letter-spacing:-0.01em; text-align:left; }
+.next-btn{ display:flex; align-items:center; gap:5px; min-height:42px; padding:0 14px; flex:none; border:0; border-radius:var(--r-sm); background:var(--orange); color:var(--on-orange); font-weight:700; font-size:13.5px; }
+.grupal{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.grupal span{ font-size:13.5px; color:var(--on-navy-2); }
+.sw{ width:54px; min-height:32px; padding:3px; flex:none; border:0; border-radius:999px; background:var(--navy-2); display:flex; align-items:center; justify-content:flex-start; transition:background .15s; }
+.sw[aria-checked="true"]{ background:var(--orange); justify-content:flex-end; }
+.sw i{ display:block; width:26px; height:26px; border-radius:999px; background:#FFFFFF; }
+
+/* ---------- prioridad ---------- */
+.prio{ background:var(--orange-wash); border-bottom:1px solid var(--orange-line); }
+.prio .gut{ padding-block:12px 13px; }
+.prio-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.prio-head .eyebrow{ color:var(--orange-ink); }
+.prio-head small{ font-size:11px; color:var(--orange-ink); opacity:.85; }
+.prio-list{ display:flex; flex-wrap:wrap; gap:6px; }
+.prio-chip{ display:flex; align-items:center; min-height:36px; padding:0 12px; border-radius:999px; background:var(--surface); border:1.5px solid var(--orange); color:var(--fg); font-size:13px; font-weight:600; }
+
+/* ---------- grilla ---------- */
+main{ display:block; }
+.grid{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; padding-block:13px; }
+@media (max-width:330px){ .grid{ grid-template-columns:repeat(3,minmax(0,1fr)); } }
+.tile{ position:relative; display:flex; flex-direction:column; justify-content:space-between; gap:6px; min-height:60px; padding:8px 7px; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); color:var(--fg); text-align:left; }
+.tile .badge{ position:absolute; top:5px; right:5px; width:18px; height:18px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:800; line-height:1; }
+.cta-band{ background:var(--av-wash); border-bottom:1px solid var(--line); }
+.cta-band .gut{ padding-block:11px 12px; display:flex; align-items:center; gap:12px; }
+.cta-band > .gut > div{ flex:1; min-width:0; }
+.cta-band b{ display:block; font-size:13.5px; color:var(--av-ink); }
+.cta-band small{ font-size:11.5px; color:var(--fg-2); line-height:1.35; }
+.pinceles{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+.pincel{ display:flex; align-items:center; gap:8px; min-height:54px; padding:8px 10px; border:2px solid transparent; border-radius:12px; text-align:left; font-size:12px; font-weight:650; line-height:1.25; }
+.pincel[aria-pressed="true"]{ border-color:currentColor; }
+.pincel .g{ width:24px; height:24px; flex:none; display:flex; align-items:center; justify-content:center; border-radius:999px; font-size:12.5px; font-weight:800; }
+
+/* ---------- mapa de la sala ---------- */
+.pizarra{ display:flex; align-items:center; justify-content:center; min-height:30px; margin-top:10px; border-radius:8px; background:var(--surface-2); color:var(--fg-2); font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.sala-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; }
+.sala-grid{ display:grid; gap:7px; }
+.seat{ position:relative; display:flex; flex-direction:column; justify-content:space-between; gap:5px; min-height:58px; padding:7px 6px; border-radius:12px; background:var(--surface); border:1px solid var(--line); color:var(--fg); text-align:left; }
+.seat.is-prio{ border:1.5px solid var(--orange); }
+.seat b{ font-size:11px; font-weight:600; line-height:1.2; }
+.seat .pos{ font-size:9.5px; color:var(--fg-3); font-variant-numeric:tabular-nums; }
+.seat.vacio{ background:transparent; border:1px dashed var(--line); }
+.seat.vacio span{ font-size:10px; color:var(--fg-3); }
+.seat .badge{ position:absolute; top:4px; right:4px; width:17px; height:17px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; }
+.toggle-vista{ display:flex; gap:3px; padding:3px; border-radius:11px; background:var(--navy-2); flex:none; }
+.toggle-vista button{ min-height:34px; padding:0 12px; border:0; border-radius:8px; background:transparent; color:var(--on-navy-2); font-size:12.5px; font-weight:650; }
+.toggle-vista button[aria-pressed="true"]{ background:var(--surface); color:var(--fg); }
+.heat{ display:flex; align-items:center; justify-content:center; min-height:46px; border-radius:9px; font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; }
+.heat.vacio{ border:1px dashed var(--line); }
+.leyenda{ display:flex; align-items:center; gap:8px; margin-top:10px; font-size:11px; color:var(--fg-2); }
+.leyenda .esc{ display:flex; flex:1; height:9px; border-radius:5px; overflow:hidden; }
+.leyenda .esc i{ flex:1; }
+.zonas{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-top:12px; }
+.zona{ border-radius:11px; padding:9px 10px; background:var(--surface-2); }
+.zona b{ display:block; font-family:var(--display); font-size:17px; font-weight:800; font-variant-numeric:tabular-nums; }
+.zona small{ display:block; font-size:10.5px; line-height:1.3; color:var(--fg-2); margin-top:1px; }
+.tile.is-prio{ border:1.5px solid var(--orange); }
+.tile b{ font-size:11.5px; font-weight:600; line-height:1.25; }
+.dots{ display:flex; gap:3px; align-items:center; min-height:6px; }
+.dots i{ width:6px; height:6px; border-radius:999px; display:block; }
+.dots u{ font-size:9.5px; text-decoration:none; color:var(--fg-3); font-variant-numeric:tabular-nums; }
+
+/* ---------- barra inferior ---------- */
+.footbar{ position:sticky; bottom:0; z-index:15; background:var(--surface); border-top:1px solid var(--line); }
+.footbar .gut{ padding-block:11px; padding-bottom:calc(11px + env(safe-area-inset-bottom,0px)); display:flex; align-items:center; gap:12px; }
+.footbar .meta{ flex:1; min-width:0; }
+.footbar .meta small{ display:block; font-size:11.5px; color:var(--fg-2); }
+.footbar .meta b{ font-size:15px; }
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:46px; padding:0 18px; border:0; border-radius:var(--r); background:var(--navy); color:var(--on-navy); font-weight:650; font-size:14px; }
+:root[data-theme="dark"] .btn, :root:not([data-theme="light"]) .btn{ }
+.btn.ghost{ background:var(--surface); border:1.5px solid var(--line); color:var(--fg); }
+.btn.accent{ background:var(--orange); color:var(--on-orange); }
+.btn.sm{ min-height:38px; padding:0 13px; font-size:13px; border-radius:var(--r-sm); }
+.btn[disabled]{ opacity:.5; }
+.btn.wide{ width:100%; }
+
+/* ---------- hoja de acciones ---------- */
+.sheet-bg{ position:fixed; inset:0; z-index:40; background:rgba(10,20,38,.55); }
+.sheet{ position:fixed; left:0; right:0; bottom:0; top:max(24px,env(safe-area-inset-top,0px)); z-index:41; display:flex; flex-direction:column; background:var(--bg); border-radius:20px 20px 0 0; overflow:hidden; }
+.sheet-head{ background:var(--surface); border-bottom:1px solid var(--line); }
+.sheet-head .gut{ padding-block:13px 14px; display:flex; flex-direction:column; gap:10px; }
+.sheet-title{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.sheet-title h2{ font-size:20px; font-weight:800; }
+.sheet-title small{ display:block; font-size:12px; color:var(--fg-2); margin-top:2px; }
+.note{ display:flex; align-items:flex-start; gap:7px; padding:8px 11px; border-radius:var(--r-sm); background:var(--orange-wash); font-size:11.5px; line-height:1.4; color:var(--orange-ink); }
+.note i{ width:7px; height:7px; border-radius:999px; background:var(--orange); flex:none; margin-top:5px; }
+.sheet-body{ flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.sheet-body .gut{ padding-block:13px; padding-bottom:calc(24px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:13px; }
+.fam{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:13px 13px 14px; }
+.fam-head{ display:flex; align-items:center; gap:8px; }
+.fam-head i{ width:9px; height:9px; border-radius:999px; flex:none; }
+.fam-head h3{ font-size:14.5px; }
+.fam p{ margin:3px 0 10px 17px; font-size:11.5px; line-height:1.45; color:var(--fg-2); }
+.acts{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.act{ display:flex; align-items:center; gap:6px; min-height:54px; padding:9px 11px; text-align:left; border:0; border-radius:12px; font-size:12.5px; font-weight:600; line-height:1.3; min-width:0; }
+.act svg{ flex:none; }
+.act .hoy{ margin-left:auto; font-size:10.5px; font-weight:700; opacity:.7; font-variant-numeric:tabular-nums; }
+
+/* ---------- modal ---------- */
+.modal-bg{ position:fixed; inset:0; z-index:50; background:rgba(10,20,38,.55); display:flex; align-items:flex-end; }
+.modal{ width:100%; max-height:84vh; overflow-y:auto; background:var(--surface); border-radius:20px 20px 0 0; }
+.modal .gut{ padding-block:16px; padding-bottom:calc(20px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:12px; }
+.modal h3{ font-size:17px; }
+.opt{ display:flex; align-items:center; gap:10px; width:100%; min-height:50px; padding:0 14px; border:1px solid var(--line); border-radius:12px; background:var(--bg); color:var(--fg); font-size:14px; font-weight:600; text-align:left; }
+.opt[aria-current="true"]{ border-color:var(--orange); border-width:1.5px; }
+.opt .n{ font-family:var(--display); font-size:12px; font-weight:800; color:var(--fg-3); flex:none; width:16px; }
+
+/* ---------- secciones de pantalla completa ---------- */
+.page .gut{ padding-block:14px; padding-bottom:calc(28px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:14px; }
+.card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:14px 13px 15px; }
+.card.warn{ background:var(--orange-wash); border-color:var(--orange-line); }
+.card h3{ font-size:14.5px; margin-bottom:3px; }
+.card .sub{ font-size:11.5px; color:var(--fg-2); margin-bottom:10px; }
+.card.warn h3{ color:var(--orange-ink); }
+.pend{ background:var(--surface); border:1px solid var(--orange-line); border-radius:12px; padding:10px 11px 11px; }
+.pend label{ display:block; font-size:12px; font-weight:650; margin-bottom:7px; }
+input[type=text],input[type=number],textarea{ width:100%; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-sm); padding:9px 11px; font-size:13.5px; }
+textarea{ min-height:110px; resize:vertical; line-height:1.45; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; }
+.stats{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.stat{ border-radius:12px; padding:10px 11px 11px; }
+.stat b{ display:block; font-family:var(--display); font-size:21px; font-weight:800; line-height:1.05; font-variant-numeric:tabular-nums; }
+.stat small{ display:block; font-size:11px; line-height:1.3; margin-top:2px; }
+.row{ display:flex; align-items:center; gap:9px; padding:8px 0; border-top:1px solid var(--line); }
+.row:first-of-type{ border-top:0; }
+.row i{ width:7px; height:7px; border-radius:999px; background:var(--orange); flex:none; }
+.row b{ font-size:13px; flex:none; }
+.row small{ font-size:11.5px; color:var(--fg-2); line-height:1.3; }
+.btn-row{ display:flex; flex-wrap:wrap; gap:8px; }
+.list-item{ display:flex; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--line); }
+.list-item:first-child{ border-top:0; }
+.list-item .grow{ flex:1; min-width:0; }
+.list-item small{ display:block; font-size:11.5px; color:var(--fg-2); }
+.link{ background:none; border:0; padding:4px 2px; color:var(--orange-ink); font-size:12.5px; font-weight:650; text-decoration:underline; text-underline-offset:2px; }
+.link.danger{ color:var(--danger); }
+.field{ display:flex; flex-direction:column; gap:5px; }
+.field label{ font-size:12px; font-weight:650; color:var(--fg-2); }
+.toggle-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 0; border-top:1px solid var(--line); }
+.toggle-row:first-of-type{ border-top:0; }
+.toggle-row div{ flex:1; min-width:0; }
+.toggle-row b{ font-size:13.5px; }
+.toggle-row small{ display:block; font-size:11.5px; color:var(--fg-2); }
+.sw2{ width:54px; min-height:32px; padding:3px; flex:none; border:1px solid var(--line); border-radius:999px; background:var(--surface-2); display:flex; align-items:center; justify-content:flex-start; }
+.sw2[aria-checked="true"]{ background:var(--orange); border-color:var(--orange); justify-content:flex-end; }
+.sw2 i{ display:block; width:24px; height:24px; border-radius:999px; background:#FFFFFF; }
+
+/* ---------- vista curso (proyector) ---------- */
+.proj{ min-height:100%; background:var(--bg); }
+.proj .gut{ padding-block:26px 30px; display:flex; flex-direction:column; gap:20px; max-width:1280px; margin:0 auto; }
+.proj-head{ display:flex; align-items:baseline; justify-content:space-between; gap:18px; flex-wrap:wrap; border-bottom:3px solid var(--navy); padding-bottom:13px; }
+:root[data-theme="dark"] .proj-head, :root:not([data-theme="light"]) .proj-head{ border-bottom-color:var(--par-dot); }
+.proj-head h1{ font-size:clamp(24px,4.4vw,34px); font-weight:800; }
+.proj-head span{ font-size:clamp(14px,2.1vw,19px); color:var(--fg-2); }
+.meta-card{ background:var(--navy); color:var(--on-navy); border-radius:var(--r-lg); padding:22px 26px 24px; display:flex; gap:28px; align-items:center; flex-wrap:wrap; }
+:root[data-theme="dark"] .meta-card, :root:not([data-theme="light"]) .meta-card{ background:var(--navy-2); }
+.meta-num{ flex:none; }
+.meta-num .eyebrow{ color:var(--on-navy-2); }
+.meta-num div{ display:flex; align-items:baseline; gap:10px; margin-top:3px; }
+.meta-num b{ font-family:var(--display); font-size:clamp(42px,8vw,62px); font-weight:800; line-height:1; font-variant-numeric:tabular-nums; }
+.meta-num span{ font-size:clamp(17px,3vw,25px); font-weight:600; color:var(--on-navy-2); }
+.meta-bar{ flex:1; min-width:220px; }
+.bar{ height:28px; border-radius:999px; background:var(--navy-2); overflow:hidden; }
+:root[data-theme="dark"] .bar, :root:not([data-theme="light"]) .bar{ background:#0D1520; }
+.bar i{ display:block; height:100%; border-radius:999px; background:var(--orange); }
+.meta-bar p{ margin:11px 0 0; font-size:clamp(14px,2.1vw,18px); }
+.proj-cols{ display:flex; gap:18px; flex-wrap:wrap; }
+.star-card{ flex:1 1 360px; min-width:0; background:var(--surface); border:2px solid var(--orange); border-radius:var(--r-lg); padding:22px 24px; display:flex; flex-direction:column; gap:11px; }
+.star-card .eyebrow{ color:var(--orange-ink); }
+.star-card b{ font-family:var(--display); font-size:clamp(30px,5.4vw,42px); font-weight:800; line-height:1.05; letter-spacing:-0.025em; }
+.star-card p{ margin:0; font-size:clamp(14px,2.1vw,18px); line-height:1.45; color:var(--fg-2); }
+.premios{ flex:1 1 380px; min-width:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; align-content:start; }
+@media (max-width:620px){ .premios{ grid-template-columns:1fr; } }
+.premio{ border-radius:16px; padding:17px 19px; display:flex; flex-direction:column; gap:6px; min-width:0; }
+.premio span{ display:flex; align-items:center; gap:7px; font-size:clamp(12px,1.7vw,15px); font-weight:650; line-height:1.25; }
+.premio b{ font-family:var(--display); font-size:clamp(20px,3.4vw,29px); font-weight:800; letter-spacing:-0.02em; line-height:1.1; }
+.proj-foot{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; font-size:14px; color:var(--fg-2); }
+
+/* ---------- toast ---------- */
+.toast{ position:fixed; left:max(12px,env(safe-area-inset-left,0px)); right:max(12px,env(safe-area-inset-right,0px)); bottom:calc(12px + env(safe-area-inset-bottom,0px)); z-index:60; display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:var(--r); background:var(--fg); color:var(--bg); font-size:13px; box-shadow:0 8px 24px rgba(0,0,0,.22); }
+.toast .grow{ flex:1; min-width:0; }
+.toast button{ flex:none; border:0; border-radius:var(--r-sm); background:var(--orange); color:var(--on-orange); font-weight:700; font-size:12.5px; min-height:36px; padding:0 13px; }
+@media (prefers-reduced-motion:no-preference){ .toast{ animation:rise .18s ease-out; } @keyframes rise{ from{ transform:translateY(10px); opacity:0 } } }
+
+.btn.verde{ background:var(--verde-btn); color:var(--on-verde); }
+
+/* ---------- consolidado ---------- */
+.seg{ display:flex; gap:3px; padding:3px; border-radius:12px; background:var(--surface-2); }
+.seg button{ flex:1; min-height:42px; border:0; border-radius:9px; background:transparent; color:var(--fg-2); font-size:13px; font-weight:600; }
+.seg button[aria-pressed="true"]{ background:var(--surface); color:var(--fg); font-weight:700; box-shadow:0 1px 3px rgba(16,30,54,.14); }
+.aviso{ display:flex; gap:9px; align-items:flex-start; padding:11px 12px; border-radius:12px; background:var(--surface-2); font-size:11.5px; line-height:1.45; color:var(--fg-2); }
+.aviso b{ color:var(--fg); }
+.bar-row{ display:flex; flex-direction:column; gap:4px; padding:8px 0; border-top:1px solid var(--line); }
+.bar-row:first-child{ border-top:0; padding-top:2px; }
+.bar-top{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.bar-n{ font-size:13px; font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bar-v{ font-size:13.5px; font-weight:700; flex:none; font-variant-numeric:tabular-nums; }
+.bar-track{ height:8px; border-radius:4px; background:var(--surface-2); overflow:hidden; }
+.bar-track i{ display:block; height:100%; border-radius:4px; }
+.bar-d{ font-size:11px; color:var(--fg-2); }
+.vacio{ margin:0; padding:12px 2px; font-size:12.5px; color:var(--fg-2); }
+.meter{ height:10px; border-radius:5px; background:var(--surface-2); overflow:hidden; margin-top:8px; }
+.meter i{ display:block; height:100%; border-radius:5px; }
+.dato{ margin:9px 0 0; font-size:12px; line-height:1.5; color:var(--fg-2); }
+.dato b{ color:var(--fg); font-variant-numeric:tabular-nums; }
+.chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
+.chip-n{ display:inline-flex; align-items:center; min-height:32px; padding:0 11px; border-radius:999px; background:var(--surface-2); font-size:12.5px; font-weight:600; }
+.rie-al{ padding:11px 0; border-top:1px solid var(--line); }
+.rie-al:first-of-type{ border-top:0; padding-top:2px; }
+.rie-al > b{ font-size:13.5px; }
+.rie-it{ display:flex; gap:9px; margin-top:7px; }
+.rie-it .c{ flex:none; min-width:24px; font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; }
+.rie-it > div{ min-width:0; }
+.rie-it .a{ font-size:12.5px; font-weight:600; line-height:1.3; }
+.rie-it .r{ font-size:11px; line-height:1.45; color:var(--fg-2); margin-top:2px; }
+.rie-it .r b{ color:var(--fg); }
+.alerta{ display:flex; gap:9px; align-items:flex-start; padding:11px 12px; border-radius:12px; font-size:11.5px; line-height:1.45; margin-top:10px; background:var(--fdt-wash); color:var(--fdt-ink); }
+.alerta.ok{ background:var(--pares-wash); color:var(--pares-ink); }
+.alerta svg{ flex:none; margin-top:1px; }
+
+/* ---------- editor de nómina ---------- */
+.file-label{ position:relative; overflow:hidden; }
+.file-label input[type=file]{ position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+.nomina{ display:flex; flex-direction:column; gap:6px; max-height:252px; overflow-y:auto; margin-top:9px; padding:9px; border:1px solid var(--line); border-radius:12px; background:var(--bg); }
+.nom-row{ display:flex; align-items:center; gap:7px; }
+.nom-row .n{ width:22px; flex:none; text-align:right; font-size:11px; color:var(--fg-3); font-variant-numeric:tabular-nums; }
+.nom-row input{ flex:1; min-width:0; padding:7px 9px; font-size:13px; }
+.nom-del{ width:36px; height:36px; flex:none; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); border-radius:9px; background:var(--surface); color:var(--fg-2); }
+.nomina-vacia{ margin:0; padding:14px 4px; text-align:center; font-size:12.5px; color:var(--fg-2); }
+
+/* ---------- pantalla de inicio ---------- */
+.inicio{ min-height:72vh; display:flex; flex-direction:column; justify-content:center; }
+.inicio .gut{ padding-block:30px 34px; display:flex; flex-direction:column; align-items:center; gap:19px; text-align:center; }
+.logo-card{ width:min(250px,68vw); display:flex; align-items:center; justify-content:center; padding:var(--logo-pad); border-radius:22px; background:var(--logo-bg); transform:translateX(var(--logo-shift)); }
+.logo-card img{ width:100%; height:auto; display:block; }
+.inicio .eyebrow{ color:var(--verde-ink); display:block; margin-bottom:5px; }
+.inicio h1{ font-size:clamp(24px,6.6vw,33px); font-weight:800; line-height:1.12; max-width:11em; }
+.marca{ display:flex; flex-direction:column; align-items:center; gap:13px; }
+.regla{ display:block; width:min(150px,45vw); height:1px; background:var(--orange); }
+.inicio .wordmark{ margin:0; font-family:var(--body); font-size:clamp(27px,7.8vw,34px); font-weight:600; letter-spacing:.2em; text-indent:.2em; line-height:1.1; color:var(--verde-ink); max-width:none; }
+.bajada{ margin:0; font-size:13px; color:var(--fg-2); }
+.wordmark-sm{ font-family:var(--body); font-size:21px; font-weight:600; letter-spacing:.2em; text-indent:.2em; color:var(--verde-ink); }
+.inicio p{ margin:0; max-width:29em; font-size:13.5px; line-height:1.55; color:var(--fg-2); }
+.acciones{ display:flex; flex-direction:column; gap:9px; width:min(330px,100%); }
+.inicio-foot{ display:flex; flex-direction:column; align-items:center; gap:2px; margin-top:2px; }
+.inicio-foot small{ font-size:11.5px; color:var(--fg-3); letter-spacing:.03em; }
+
+.empty{ text-align:center; padding:28px 8px; }
+.empty h2{ font-size:19px; margin-bottom:6px; }
+.empty p{ margin:0 auto 16px; max-width:34em; font-size:13.5px; color:var(--fg-2); }
+</style>
+
+<div id="app"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ========== catálogo ========== */
+var LOGO = "data:image/png;base64,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";
+
+var FASES = [
+  {id:"entrada",       t:"Apertura"},
+  {id:"modelaje",      t:"Modelamiento"},
+  {id:"guiada",        t:"Acompañamiento"},
+  {id:"independiente", t:"Autonomía"},
+  {id:"salida",        t:"Cierre"}
+];
+
+var FAMILIAS = [
+  {id:"par",   t:"Participación",   pie:"Lo que hace frente al curso, por decisión propia o porque tú lo llamas."},
+  {id:"fdt",   t:"Fuera de tarea",  pie:"Cada acción guarda abajo su tipo (motor, verbal o pasivo) para el análisis posterior."},
+  {id:"doc",   t:"Tu interacción",  pie:"No mide al estudiante, te mide a ti. Se analiza aparte del resto."},
+  {id:"pares", t:"Entre pares",     pie:"Solo cuando circulas puesto por puesto: para distinguirlas hay que escuchar."}
+];
+
+var ACCIONES = [
+  {id:"p-vol",      f:"par", t:"Levanta la mano y participa",      k:"voluntaria", s:1},
+  {id:"p-dir-ok",   f:"par", t:"Lo llamo y responde bien",         k:"llamada",    s:1},
+  {id:"p-vol-err",  f:"par", t:"Participa y se equivoca",          k:"voluntaria", s:1, mc:true},
+  {id:"p-preg",     f:"par", t:"Pregunta sobre el contenido",      k:"voluntaria", s:1, mc:true},
+  {id:"p-idea",     f:"par", t:"Aporta una idea o argumenta",      k:"voluntaria", s:1},
+  {id:"p-dir-err",  f:"par", t:"Lo llamo y responde con error",    k:"llamada",    s:0},
+  {id:"p-dir-nose", f:"par", t:"Lo llamo y no sabe qué hacíamos",  k:"llamada",    s:-1},
+  {id:"p-dir-no",   f:"par", t:"Lo llamo y no responde",           k:"llamada",    s:-1},
+  {id:"p-otro",     f:"par", t:"Otro", s:0, otro:true},
+
+  {id:"f-conv",  f:"fdt", t:"Conversa de otro tema",         boss:"verbal", s:-1},
+  {id:"f-mira",  f:"fdt", t:"Mira a otro lado sin trabajar", boss:"pasivo", s:-1},
+  {id:"f-noini", f:"fdt", t:"No empieza la tarea",           boss:"pasivo", s:-1},
+  {id:"f-lev",   f:"fdt", t:"Se levanta del puesto",         boss:"motor",  s:-1},
+  {id:"f-obj",   f:"fdt", t:"Juega con objetos",             boss:"motor",  s:-1},
+  {id:"f-ruido", f:"fdt", t:"Interrumpe o hace ruidos",      boss:"verbal", s:-1},
+  {id:"f-cel",   f:"fdt", t:"Celular u otra asignatura",     boss:"motor",  s:-1},
+  {id:"f-otro",  f:"fdt", t:"Otro", s:0, otro:true},
+
+  {id:"d-elog-esp", f:"doc", t:"Lo felicito nombrando qué hizo", s:1, elogioEsp:true},
+  {id:"d-atencion", f:"doc", t:"Le llamo la atención",           s:-1},
+  {id:"d-justif",   f:"doc", t:"Le pido que justifique",         s:1},
+  {id:"d-explico",  f:"doc", t:"Le explico el contenido",        s:0},
+  {id:"d-norma",    f:"doc", t:"Le recuerdo la norma antes",     s:0},
+  {id:"d-elog-gen", f:"doc", t:"Lo felicito en general",         s:1},
+  {id:"d-otro",     f:"doc", t:"Otro", s:0, otro:true},
+
+  {id:"e-explica",    f:"pares", t:"Le explica a un compañero",      s:1, explica:true},
+  {id:"e-pide-exp",   f:"pares", t:"Le pide que le explique",        s:1},
+  {id:"e-da-resp",    f:"pares", t:"Le da la respuesta",             s:0},
+  {id:"e-pide-resp",  f:"pares", t:"Le pide la respuesta",           s:0},
+  {id:"e-aplica",     f:"pares", t:"Usa la ayuda que le dieron",     s:1},
+  {id:"e-argumenta",  f:"pares", t:"Defiende su idea con argumentos",s:1},
+  {id:"e-conflicto",  f:"pares", t:"Se enoja con un compañero",      s:-1},
+  {id:"e-otro",       f:"pares", t:"Otro", s:0, otro:true}
+];
+
+var BARRIDO = [
+  { id:"ok",  t:"Terminado y correcto",  g:"✓", tok:"ok" },
+  { id:"err", t:"Terminado con errores", g:"!",      tok:"err" },
+  { id:"av",  t:"Va avanzando",          g:"…", tok:"av" },
+  { id:"no",  t:"No empezó",         g:"○", tok:"no" }
+];
+var BAR_BY_ID = {}; BARRIDO.forEach(function(b){ BAR_BY_ID[b.id] = b; });
+var FASES_BARRIDO = { independiente:true, guiada:true };
+
+var ACC_BY_ID = {}; ACCIONES.forEach(function(a){ ACC_BY_ID[a.id] = a; });
+var FAM_BY_ID = {}; FAMILIAS.forEach(function(f){ FAM_BY_ID[f.id] = f; });
+var VENTANA = 6;
+
+var PREMIOS = [
+  {id:"mejora",     def:"Mayor mejora"},
+  {id:"primera",    def:"Primera participación"},
+  {id:"crecimiento",def:"Mentalidad de crecimiento"},
+  {id:"explica",    def:"Mejor explicación a un compañero"}
+];
+
+/* ========== almacenamiento ========== */
+/* En su propio sitio puede descargar y compartir archivos; dentro de un
+   visor incrustado eso está bloqueado, y ahí solo queda copiar y pegar. */
+var APP_PROPIA = (function(){ try{ return window.self === window.top; }catch(e){ return false; } })();
+
+var KEY = "registro-participacion-v1";
+var DB = null;
+var vista = "clase";
+var sheetAlumno = null;
+var modal = null;
+var toastTimer = null;
+var toastData = null;
+var avisoRespaldo = true;
+var focoPendiente = null;
+var periodo = "semana";
+var barrido = null;
+
+function nuevoDB(){
+  return {
+    v:1, cursos:[], cursoActivo:null, registros:[], clases:[], barridos:[],
+    semanas:{},
+    config:{ mostrarInicio:true, vistaCurso:true, reconocimientos:true, meta:250, etiquetaPrincipal:"Matemático de la semana", etiquetas:{}, ultimoRespaldo:null }
+  };
+}
+function cargar(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){ var d = JSON.parse(raw); if(d && d.cursos){ return normalizar(d); } }
+  }catch(e){}
+  return nuevoDB();
+}
+function normalizar(d){
+  var base = nuevoDB();
+  d.config = Object.assign({}, base.config, d.config || {});
+  d.config.etiquetas = d.config.etiquetas || {};
+  d.semanas = d.semanas || {};
+  d.registros = d.registros || [];
+  d.clases = d.clases || [];
+  d.barridos = d.barridos || [];
+  return d;
+}
+function guardar(){
+  try{ localStorage.setItem(KEY, JSON.stringify(DB)); }
+  catch(e){ toast("No se pudo guardar en este navegador. Copia un respaldo desde Ajustes.", null); }
+}
+
+/* ========== utilidades ========== */
+function h(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function uid(){ return Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4); }
+function hoyISO(d){ d = d || new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function hora(ts){ var d = new Date(ts); return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0"); }
+function fechaLarga(iso){
+  var m = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  var dd = ["dom","lun","mar","mié","jue","vie","sáb"];
+  var p = iso.split("-"); var d = new Date(+p[0], +p[1]-1, +p[2]);
+  return dd[d.getDay()] + " " + (+p[2]) + " " + m[+p[1]-1];
+}
+function semanaKey(d){
+  d = new Date(d); d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+  var ini = new Date(d.getFullYear(), 0, 1);
+  var n = Math.ceil(((d - ini) / 86400000 + 1) / 7);
+  return d.getFullYear() + "-S" + String(n).padStart(2,"0");
+}
+function rangoSemana(base){
+  var d = new Date(base); d.setHours(0,0,0,0);
+  var dia = d.getDay() || 7;
+  var lun = new Date(d); lun.setDate(d.getDate() - dia + 1);
+  var vie = new Date(lun); vie.setDate(lun.getDate() + 4);
+  var m = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  if(lun.getMonth() === vie.getMonth()) return "Semana del " + lun.getDate() + " al " + vie.getDate() + " de " + m[vie.getMonth()];
+  return "Semana del " + lun.getDate() + " de " + m[lun.getMonth()] + " al " + vie.getDate() + " de " + m[vie.getMonth()];
+}
+function corto(nombre){
+  var n = String(nombre).replace(/\s+/g," ").trim();
+  if(n.indexOf(",") > -1){
+    var pp = n.split(",");
+    var ap = (pp[0]||"").trim().split(" ")[0] || "";
+    var no = (pp[1]||"").trim().split(" ")[0] || "";
+    return (no + (ap ? " " + ap.charAt(0).toUpperCase() + "." : "")).trim() || n;
+  }
+  var t = n.split(" ");
+  if(t.length === 1) return t[0];
+  return t[0] + " " + t[1].charAt(0).toUpperCase() + ".";
+}
+
+/* ========== acceso a datos ========== */
+function curso(){ return DB.cursos.filter(function(c){ return c.id === DB.cursoActivo; })[0] || DB.cursos[0] || null; }
+function alumnosDe(c){ return (c && c.estudiantes) || []; }
+function alumno(c, id){ return alumnosDe(c).filter(function(a){ return a.id === id; })[0] || null; }
+function salaDe(c){ return (c && c.sala) || null; }
+function asientoDe(c, aid){
+  var s = salaDe(c); if(!s) return "";
+  var ks = Object.keys(s.asientos || {});
+  for(var i = 0; i < ks.length; i++){ if(s.asientos[ks[i]] === aid) return ks[i]; }
+  return "";
+}
+function sinPuesto(c){
+  var s = salaDe(c); if(!s) return alumnosDe(c);
+  var ocupados = {};
+  Object.keys(s.asientos || {}).forEach(function(k){ ocupados[s.asientos[k]] = true; });
+  return alumnosDe(c).filter(function(a){ return !ocupados[a.id]; });
+}
+function clasesDe(cid){ return DB.clases.filter(function(x){ return x.cursoId === cid; }).sort(function(a,b){ return b.ts - a.ts; }); }
+function claseAbierta(cid){ return DB.clases.filter(function(x){ return x.cursoId === cid && !x.cerrada; }).sort(function(a,b){ return b.ts - a.ts; })[0] || null; }
+function asegurarClase(){
+  var c = curso(); if(!c) return null;
+  var cl = claseAbierta(c.id);
+  if(cl) return cl;
+  cl = { id:uid(), cursoId:c.id, fecha:hoyISO(), ts:Date.now(), cerrada:false, fase:FASES[0].id, grupal:false };
+  DB.clases.push(cl); guardar();
+  return cl;
+}
+function regsDeClase(clId){ return DB.registros.filter(function(r){ return r.claseId === clId; }); }
+
+/* ========== prioridad viva ========== */
+function prioridad(c, cl){
+  if(!c) return [];
+  var lista = clasesDe(c.id).slice(0, VENTANA);
+  if(cl && lista.map(function(x){ return x.id; }).indexOf(cl.id) === -1) lista.unshift(cl);
+  var idx = {}; lista.forEach(function(x,i){ idx[x.id] = i; });
+  var ultLlam = {}, ultVol = {}, totalPar = {};
+  DB.registros.forEach(function(r){
+    if(!(r.claseId in idx)) return;
+    var a = ACC_BY_ID[r.accionId]; if(!a || a.f !== "par") return;
+    var i = idx[r.claseId];
+    totalPar[r.alumnoId] = (totalPar[r.alumnoId] || 0) + 1;
+    if(a.k === "llamada" && (ultLlam[r.alumnoId] === undefined || i < ultLlam[r.alumnoId])) ultLlam[r.alumnoId] = i;
+    if(a.k === "voluntaria" && (ultVol[r.alumnoId] === undefined || i < ultVol[r.alumnoId])) ultVol[r.alumnoId] = i;
+  });
+  var arr = alumnosDe(c).map(function(a){
+    var l = ultLlam[a.id] === undefined ? VENTANA : ultLlam[a.id];
+    var v = ultVol[a.id] === undefined ? VENTANA : ultVol[a.id];
+    return { id:a.id, nombre:a.nombre, score:l + v, llam:l, vol:v, tot:totalPar[a.id] || 0 };
+  });
+  arr.sort(function(x,y){ return (y.score - x.score) || (x.tot - y.tot) || x.nombre.localeCompare(y.nombre,"es"); });
+  var n = Math.max(1, Math.round(alumnosDe(c).length * 0.10));
+  return arr.slice(0, n);
+}
+function razon(p){
+  if(p.llam >= VENTANA && p.vol >= VENTANA) return "sin registros de participación";
+  if(p.llam >= p.vol) return p.llam >= VENTANA ? "no lo llamas en la ventana" : "no lo llamas hace " + p.llam + (p.llam === 1 ? " clase" : " clases");
+  return p.vol >= VENTANA ? "sin participación voluntaria" : "sin participar hace " + p.vol + (p.vol === 1 ? " clase" : " clases");
+}
+
+/* ========== registrar ========== */
+function registrar(alumnoId, accionId){
+  var c = curso(); var cl = asegurarClase(); if(!c || !cl) return;
+  var a = ACC_BY_ID[accionId];
+  var r = { id:uid(), cursoId:c.id, claseId:cl.id, alumnoId:alumnoId, accionId:accionId,
+            fase:cl.fase, grupal:!!cl.grupal, asiento:asientoDe(c, alumnoId), ts:Date.now(), nota:"" };
+  DB.registros.push(r); guardar();
+  sheetAlumno = null;
+  var nom = corto((alumno(c, alumnoId) || {}).nombre || "");
+  toast(nom + " · " + a.t + (a.otro ? " · lo describes al cerrar" : ""), r.id);
+  render();
+}
+function deshacer(id){
+  DB.registros = DB.registros.filter(function(r){ return r.id !== id; });
+  guardar(); cerrarToast(); render();
+}
+
+/* ========== toast ========== */
+function toast(texto, regId){
+  toastData = { texto:texto, regId:regId };
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toastData = null; render(); }, 6000);
+}
+function cerrarToast(){ toastData = null; if(toastTimer) clearTimeout(toastTimer); }
+
+/* ========== semana y reconocimientos ========== */
+function regsSemana(cid, offsetSemanas){
+  var base = new Date(); base.setDate(base.getDate() - 7 * (offsetSemanas || 0));
+  var k = semanaKey(base);
+  return DB.registros.filter(function(r){ return r.cursoId === cid && semanaKey(new Date(r.ts)) === k; });
+}
+function conteoPositivo(regs){
+  var m = {};
+  regs.forEach(function(r){ var a = ACC_BY_ID[r.accionId]; if(a && a.f === "par" && a.s > 0) m[r.alumnoId] = (m[r.alumnoId]||0)+1; });
+  return m;
+}
+function top(mapa, n){
+  return Object.keys(mapa).filter(function(k){ return mapa[k] > 0; })
+    .sort(function(a,b){ return mapa[b] - mapa[a]; }).slice(0, n || 3);
+}
+function candidatos(c){
+  var esta = regsSemana(c.id, 0), previa = regsSemana(c.id, 1);
+  var cE = conteoPositivo(esta), cP = conteoPositivo(previa);
+  var mejora = {}; alumnosDe(c).forEach(function(a){
+    var d = (cE[a.id]||0) - (cP[a.id]||0); if(d > 0) mejora[a.id] = d;
+  });
+  var crec = {}, expl = {};
+  esta.forEach(function(r){
+    var a = ACC_BY_ID[r.accionId]; if(!a) return;
+    if(a.mc) crec[r.alumnoId] = (crec[r.alumnoId]||0)+1;
+    if(a.explica) expl[r.alumnoId] = (expl[r.alumnoId]||0)+1;
+  });
+  var primeraVezAntes = {};
+  DB.registros.forEach(function(r){
+    if(r.cursoId !== c.id) return;
+    var a = ACC_BY_ID[r.accionId]; if(!a || a.k !== "voluntaria") return;
+    if(semanaKey(new Date(r.ts)) !== semanaKey(new Date())) primeraVezAntes[r.alumnoId] = true;
+  });
+  var primera = {};
+  esta.forEach(function(r){
+    var a = ACC_BY_ID[r.accionId]; if(!a || a.k !== "voluntaria") return;
+    if(!primeraVezAntes[r.alumnoId]) primera[r.alumnoId] = (primera[r.alumnoId]||0)+1;
+  });
+  var principal = {};
+  esta.forEach(function(r){
+    var a = ACC_BY_ID[r.accionId]; if(!a || a.f === "doc") return;
+    if(a.s > 0) principal[r.alumnoId] = (principal[r.alumnoId]||0) + 1;
+  });
+  return { mejora:top(mejora), primera:top(primera), crecimiento:top(crec), explica:top(expl), principal:top(principal) };
+}
+function premioGuardado(c, key){
+  var s = DB.semanas[c.id + "|" + semanaKey(new Date())];
+  return s ? s[key] : null;
+}
+function fijarPremio(c, key, alumnoId){
+  var k = c.id + "|" + semanaKey(new Date());
+  DB.semanas[k] = DB.semanas[k] || {};
+  if(alumnoId) DB.semanas[k][key] = alumnoId; else delete DB.semanas[k][key];
+  guardar(); render();
+}
+function etiqueta(id, def){ return (DB.config.etiquetas && DB.config.etiquetas[id]) || def; }
+
+/* ========== exportación ========== */
+function csv(){
+  var filas = [["tipo_registro","curso","fecha","hora","fase","estudiante","familia","accion","tipo_participacion","tipo_fuera_tarea","trabajo_grupal","signo","nota"]];
+  function nombreFase(id){ var f = FASES.filter(function(x){ return x.id === id; })[0]; return f ? f.t : ""; }
+  DB.registros.slice().sort(function(a,b){ return a.ts - b.ts; }).forEach(function(r){
+    var c = DB.cursos.filter(function(x){ return x.id === r.cursoId; })[0];
+    var al = c ? alumno(c, r.alumnoId) : null;
+    var cl = DB.clases.filter(function(x){ return x.id === r.claseId; })[0];
+    var a = ACC_BY_ID[r.accionId]; if(!a) return;
+    filas.push([ "interaccion", c?c.nombre:"", cl?cl.fecha:"", hora(r.ts), nombreFase(r.fase), al?al.nombre:"",
+      FAM_BY_ID[a.f].t, a.t, a.k||"", a.boss||"", r.grupal?"sí":"no", a.s>0?"+":(a.s<0?"-":"0"), r.nota||"" ]);
+  });
+  DB.barridos.slice().sort(function(a,b){ return a.ts - b.ts; }).forEach(function(b){
+    var c = DB.cursos.filter(function(x){ return x.id === b.cursoId; })[0];
+    var cl = DB.clases.filter(function(x){ return x.id === b.claseId; })[0];
+    Object.keys(b.marcas || {}).forEach(function(aid){
+      var al = c ? alumno(c, aid) : null;
+      var e = BAR_BY_ID[b.marcas[aid]]; if(!e) return;
+      filas.push([ "barrido", c?c.nombre:"", cl?cl.fecha:"", hora(b.ts), nombreFase(b.fase), al?al.nombre:"",
+        "Práctica autónoma", e.t, "", "", "", e.id === "ok" ? "+" : (e.id === "no" ? "-" : "0"), "" ]);
+    });
+  });
+  return filas.map(function(f){
+    return f.map(function(v){ v = String(v==null?"":v); return /[",;\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; }).join(";");
+  }).join("\n");
+}
+function nombreArchivo(ext){ return "turnos-" + (curso() ? curso().nombre.replace(/[^\wÁÉÍÓÚÑáéíóúñ°]+/g,"-") + "-" : "") + hoyISO() + "." + ext; }
+function descargar(nombre, texto, tipo){
+  try{
+    var b = new Blob([texto], { type: tipo });
+    var u = URL.createObjectURL(b);
+    var a = document.createElement("a");
+    a.href = u; a.download = nombre; a.style.display = "none";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ try{ URL.revokeObjectURL(u); a.remove(); }catch(e){} }, 2000);
+    toast("Descargado: " + nombre, null); render();
+  }catch(e){ toast("No se pudo descargar. Usa copiar y pegar.", null); render(); }
+}
+function compartir(nombre, texto, tipo){
+  try{
+    if(navigator.canShare && typeof File === "function"){
+      var f = new File([texto], nombre, { type: tipo });
+      if(navigator.canShare({ files:[f] })){
+        navigator.share({ files:[f], title:nombre }).catch(function(){});
+        return;
+      }
+    }
+    if(navigator.share){ navigator.share({ title:nombre, text:texto }).catch(function(){}); return; }
+    copiar(texto, "bak");
+  }catch(e){ copiar(texto, "bak"); }
+}
+function copiar(texto, ok){
+  function fallback(){
+    var el = document.getElementById(ok === "csv" ? "out-csv" : "out-bak");
+    if(el){ el.focus(); el.select(); }
+    toast("No se pudo copiar solo. El texto quedó seleccionado: cópialo a mano.", null); render();
+  }
+  try{
+    navigator.clipboard.writeText(texto).then(function(){ toast("Copiado. Pégalo donde lo necesites.", null); render(); }, fallback);
+  }catch(e){ fallback(); }
+}
+
+/* ========== render ========== */
+function render(){
+  var app = document.getElementById("app");
+  var c = curso();
+  var html = "";
+  if(!c && vista !== "config" && vista !== "inicio" && vista !== "quienes"){ vista = "config"; }
+  document.body.setAttribute("data-vista", vista);
+  if(vista === "inicio")      html = vistaInicio(c);
+  else if(vista === "clase" && barrido) html = vistaBarrido(c);
+  else if(vista === "clase")  html = vistaClase(c);
+  else if(vista === "cierre") html = vistaCierre(c);
+  else if(vista === "consolidado") html = vistaConsolidado(c);
+  else if(vista === "sala")   html = vistaSala(c);
+  else if(vista === "quienes") html = vistaQuienes();
+  else if(vista === "curso")  html = vistaCurso(c);
+  else                        html = vistaConfig(c);
+  if(sheetAlumno && vista === "clase") html += hojaAcciones(c, sheetAlumno);
+  if(modal) html += modalHTML(c);
+  if(toastData) html += '<div class="toast" role="status"><span class="grow">' + h(toastData.texto) + '</span>' +
+    (toastData.regId ? '<button type="button" data-act="deshacer" data-id="' + toastData.regId + '">Deshacer</button>' : '') + '</div>';
+  app.innerHTML = html;
+  if(focoPendiente){
+    var f = document.getElementById(focoPendiente);
+    focoPendiente = null;
+    if(f){ try{ f.focus(); }catch(e){} }
+  }
+}
+
+function estrellaSVG(size, color){
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.4l-3.8 2 .7-4.3-3.1-3 4.3-.6z" fill="'+color+'"></path></svg>';
+}
+
+/* ---- pantalla de inicio ---- */
+function vistaInicio(c){
+  var s = '<div class="inicio"><div class="gut">';
+  s += '<div class="logo-card"><img src="' + LOGO + '" alt="Savia Educa"></div>';
+  s += '<div class="marca"><span class="regla"></span>' +
+       '<h1 class="wordmark">TURNOS</h1>' +
+       '<p class="bajada">Registro de interacciones de aula</p></div>';
+  s += '<p>Registra durante la clase, con un toque, la participación y las interacciones de tus estudiantes. Es el insumo previo a la nota, no la nota.</p>';
+  s += '<div class="acciones">';
+  if(c && alumnosDe(c).length){
+    s += '<button type="button" class="btn verde wide" data-act="ir" data-v="clase">Entrar a ' + h(c.nombre) + '</button>' +
+         '<button type="button" class="btn ghost wide" data-act="ir" data-v="consolidado">Ver el consolidado</button>' +
+         '<button type="button" class="btn ghost wide" data-act="ir" data-v="config">Mis cursos y ajustes</button>';
+  } else if(c){
+    s += '<button type="button" class="btn verde wide" data-act="modal" data-m="editar-curso" data-id="' + c.id + '">Agregar la nómina de ' + h(c.nombre) + '</button>' +
+         '<button type="button" class="btn ghost wide" data-act="ir" data-v="config">Mis cursos y ajustes</button>';
+  } else {
+    s += '<button type="button" class="btn verde wide" data-act="modal" data-m="nuevo-curso">Crear mi primer curso</button>' +
+         '<button type="button" class="btn ghost wide" data-act="ejemplo">Probar con un curso de ejemplo</button>';
+  }
+  s += '</div>';
+  s += '<div class="inicio-foot"><small>Desarrollada por Savia Educa</small>' +
+       '<button type="button" class="link" data-act="ir" data-v="quienes">Quiénes somos</button>' +
+       '<button type="button" class="link" data-act="saltar-inicio">No mostrar esta pantalla al abrir</button></div>';
+  s += '</div></div>';
+  return s;
+}
+
+/* ---- vista clase ---- */
+function vistaClase(c){
+  var cl = asegurarClase();
+  var fase = FASES.filter(function(f){ return f.id === cl.fase; })[0] || FASES[0];
+  var faseIdx = FASES.indexOf(fase);
+  var ultima = faseIdx === FASES.length - 1;
+  var regs = regsDeClase(cl.id);
+  var prio = prioridad(c, cl);
+  var prioIds = {}; prio.forEach(function(p){ prioIds[p.id] = true; });
+
+  var porAlumno = {};
+  regs.forEach(function(r){
+    var a = ACC_BY_ID[r.accionId]; if(!a) return;
+    (porAlumno[r.alumnoId] = porAlumno[r.alumnoId] || []).push(a.f);
+  });
+  var sinNada = alumnosDe(c).filter(function(a){ return !porAlumno[a.id]; }).length;
+
+  var s = "";
+  s += '<header class="topbar"><div class="gut">';
+  s += '<div class="toprow"><button type="button" class="curso-pick" data-act="modal" data-m="curso">' +
+        '<b>' + h(c.nombre) + '</b><span>' + h(c.asignatura || "") + (c.asignatura ? " · " : "") + fechaLarga(cl.fecha) + '</span></button>' +
+        '<div style="display:flex;gap:7px;flex:none">' +
+        (DB.config.vistaCurso ? '<button type="button" class="icon-btn" data-act="ir" data-v="curso" aria-label="Vista para el curso">' + estrellaSVG(17,"currentColor") + '</button>' : '') +
+        '<button type="button" class="icon-btn" data-act="ir" data-v="config" aria-label="Ajustes">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.1" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.4M12 18.8v2.4M4.5 4.5l1.7 1.7M17.8 17.8l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.5 19.5l1.7-1.7M17.8 6.2l1.7-1.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>' +
+        '</div></div>';
+  s += '<div class="fase-box"><div class="fase-now"><div class="eyebrow">Fase ' + (faseIdx+1) + ' de ' + FASES.length + '</div>' +
+       '<button type="button" class="fase-btn" data-act="modal" data-m="fase">' + h(fase.t) +
+       '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>';
+  s += ultima
+    ? '<button type="button" class="next-btn" data-act="ir" data-v="cierre">Cerrar clase</button>'
+    : '<button type="button" class="next-btn" data-act="fase-next">Siguiente<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+  s += '</div>';
+  s += '<div class="grupal"><span>Trabajo grupal</span><button type="button" class="sw" role="switch" aria-checked="' + (cl.grupal?"true":"false") + '" aria-label="Trabajo grupal" data-act="grupal"><i></i></button></div>';
+  s += '</div></header>';
+
+  if(prio.length){
+    s += '<section class="prio" aria-label="Prioridad de participación"><div class="gut">' +
+      '<div class="prio-head"><span class="eyebrow">Pregúntale a</span><small>se actualiza solo</small></div><div class="prio-list">';
+    prio.forEach(function(p){ s += '<button type="button" class="prio-chip" data-act="abrir" data-id="' + p.id + '">' + h(corto(p.nombre)) + '</button>'; });
+    s += '</div></div></section>';
+  }
+
+  if(FASES_BARRIDO[cl.fase]){
+    var hechos = DB.barridos.filter(function(b){ return b.claseId === cl.id; }).length;
+    s += '<section class="cta-band"><div class="gut"><div>' +
+      '<b>Barrido de práctica</b><small>' + (hechos ? hechos + (hechos === 1 ? " barrido hecho en esta clase" : " barridos hechos en esta clase") : "Mira el cuaderno de cada uno y marca en un toque") + '</small></div>' +
+      '<button type="button" class="btn sm accent" data-act="barrido-ini" style="flex:none">Iniciar</button></div></section>';
+  }
+
+  var dias = DB.config.ultimoRespaldo ? Math.floor((Date.now() - DB.config.ultimoRespaldo)/86400000) : null;
+  if(avisoRespaldo && DB.registros.length > 20 && (dias === null || dias >= 7)){
+    s += '<div class="gut" style="padding-block:10px 0"><div class="card warn" style="display:flex;gap:10px;align-items:flex-start">' +
+      '<div style="flex:1;min-width:0"><h3>Respalda tus datos</h3><div class="sub" style="margin:0">' +
+      (dias === null ? "Todavía no has hecho ningún respaldo." : "Van " + dias + " días desde tu último respaldo.") +
+      ' Si cambias de teléfono o borras los datos del navegador, se pierde todo.</div></div>' +
+      '<button type="button" class="btn sm accent" data-act="ir" data-v="config" data-sec="respaldo">Respaldar</button>' +
+      '<button type="button" class="icon-btn" style="background:transparent;width:32px;height:32px" data-act="cerrar-aviso" aria-label="Ocultar aviso">' +
+      '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>' +
+      '</div></div>';
+  }
+
+  function puntos(a){
+    var fams = porAlumno[a.id] || [];
+    var vistos = [], extra = 0;
+    fams.forEach(function(f){ if(vistos.length < 3 && vistos.indexOf(f) === -1) vistos.push(f); });
+    if(fams.length > vistos.length) extra = fams.length - vistos.length;
+    return '<span class="dots">' + vistos.map(function(f){ return '<i style="background:var(--' + f + '-dot)"></i>'; }).join("") +
+      (extra ? '<u>+' + extra + '</u>' : '') + '</span>';
+  }
+
+  var sala = salaDe(c);
+  var enSala = sala && DB.config.vistaSala;
+  s += '<main class="gut">';
+  if(sala){
+    s += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px">' +
+      '<span class="eyebrow" style="color:var(--fg-2)">' + (enSala ? "Mapa de la sala" : "Lista del curso") + '</span>' +
+      '<div class="toggle-vista" style="background:var(--surface-2)">' +
+      '<button type="button" aria-pressed="' + (!enSala?"true":"false") + '" data-act="modo-lista" style="color:' + (!enSala?"var(--fg)":"var(--fg-2)") + '">Lista</button>' +
+      '<button type="button" aria-pressed="' + (enSala?"true":"false") + '" data-act="modo-sala" style="color:' + (enSala?"var(--fg)":"var(--fg-2)") + '">Sala</button>' +
+      '</div></div>';
+  }
+
+  if(enSala){
+    s += '<div style="padding-top:12px"><div class="sala-scroll"><div class="sala-grid" style="grid-template-columns:repeat(' + sala.cols + ',minmax(58px,1fr))">';
+    for(var fi = sala.filas - 1; fi >= 0; fi--){
+      for(var ci = 0; ci < sala.cols; ci++){
+        var key = fi + "-" + ci;
+        var aid = (sala.asientos || {})[key];
+        var al = aid ? alumno(c, aid) : null;
+        if(!al){ s += '<div class="seat vacio"><span>' + (fi+1) + '·' + (ci+1) + '</span></div>'; continue; }
+        s += '<button type="button" class="seat' + (prioIds[al.id] ? " is-prio" : "") + '" data-act="abrir" data-id="' + al.id + '">' +
+          '<b>' + h(corto(al.nombre)) + '</b>' + puntos(al) +
+          '<span class="pos" style="position:absolute;top:5px;right:6px">' + (fi+1) + '·' + (ci+1) + '</span></button>';
+      }
+    }
+    s += '</div></div><div class="pizarra">Pizarra</div>';
+    var sp = sinPuesto(c);
+    if(sp.length){
+      s += '<div style="margin-top:14px"><span class="eyebrow" style="color:var(--fg-2)">Sin puesto asignado</span>' +
+        '<div class="grid" style="padding-top:8px">' +
+        sp.map(function(a){
+          return '<button type="button" class="tile' + (prioIds[a.id] ? " is-prio" : "") + '" data-act="abrir" data-id="' + a.id + '">' +
+            '<b>' + h(corto(a.nombre)) + '</b>' + puntos(a) + '</button>';
+        }).join("") + '</div></div>';
+    }
+    s += '</div>';
+  } else {
+    s += '<div class="grid">';
+    alumnosDe(c).forEach(function(a){
+      s += '<button type="button" class="tile' + (prioIds[a.id] ? " is-prio" : "") + '" data-act="abrir" data-id="' + a.id + '">' +
+        '<b>' + h(corto(a.nombre)) + '</b>' + puntos(a) + '</button>';
+    });
+    s += '</div>';
+  }
+  s += '</main>';
+
+  s += '<div class="footbar"><div class="gut"><div class="meta">' +
+    '<small>Sin ningún registro hoy</small><b class="num">' + sinNada + (sinNada === 1 ? " estudiante" : " estudiantes") + '</b></div>' +
+    '<span class="num" style="font-size:12px;color:var(--fg-2);flex:none">' + regs.length + ' hoy</span>' +
+    '<button type="button" class="btn" data-act="ir" data-v="cierre">Cerrar clase</button></div></div>';
+  return s;
+}
+
+/* ---- quiénes somos ---- */
+function vistaQuienes(){
+  var s = '<header class="topbar"><div class="gut"><div class="toprow">' +
+    '<button type="button" class="icon-btn" data-act="ir" data-v="inicio" aria-label="Volver">' +
+    '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 2L4 8l6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+    '<div style="flex:1;min-width:0"><b style="font-family:var(--display);font-size:18px;font-weight:700">Quiénes somos</b>' +
+    '<div style="font-size:12px;color:var(--on-navy-2)">Turnos · Savia Educa</div></div>' +
+    '</div></div></header>';
+
+  s += '<div class="page"><div class="gut">';
+  s += '<section class="card" style="text-align:center"><div class="logo-card" style="width:min(225px,62vw);margin:2px auto 14px">' +
+    '<img src="' + LOGO + '" alt="Savia Educa"></div>' +
+    '<span class="regla" style="margin:0 auto 12px"></span>' +
+    '<div class="wordmark-sm">TURNOS</div>' +
+    '<p class="dato" style="margin-top:7px">Registro de interacciones de aula<br>Desarrollada por Savia Educa</p></section>';
+
+  function bloque(t, parrafos){
+    return '<section class="card"><h3>' + h(t) + '</h3>' +
+      parrafos.map(function(x){ return '<p class="dato" style="font-size:13px;line-height:1.6">' + x + '</p>'; }).join("") + '</section>';
+  }
+
+  s += bloque("Qué es", ["Una app web que corre en el teléfono del profesor durante la clase. Un archivo, sin servidor y sin cuenta: los datos quedan en el dispositivo de cada profesor."]);
+  s += bloque("Qué problema resuelve", ["Entre lo que pasa en la clase y lo que queda registrado hay un vacío. El libro de clases guarda notas y anotaciones: el resultado y la falta. Nadie guarda quién participó, quién no, y qué hacía el que no participaba. Turnos produce ese insumo, que es previo a la nota y previo a la anotación."]);
+  s += bloque("Quién la usa", ["El profesor de asignatura, solo, en su teléfono, mientras hace clases. Admite varios cursos. Cualquier profesor la carga con sus propios cursos."]);
+  s += bloque("Objetivo", ["Tomar decisiones pedagógicas con evidencia en vez de impresión: a quién preguntar la próxima clase, quién termina rápido pero equivocado, en qué fase se cae la clase, y qué tan parejo reparte el profesor sus turnos."]);
+  s += bloque("Cómo funciona", [
+    "Registrar toma dos toques: el estudiante, luego la acción. Hay 29 acciones en cuatro familias, nombradas por la conducta concreta y agrupadas por color. Cada registro guarda la fase de la clase, si era trabajo grupal, y el puesto.",
+    "Durante la clase hay una franja viva con el 10% del curso que menos ha participado, que se reordena sola cada vez que registras. En las fases de trabajo hay un barrido de la práctica autónoma, con cuatro estados y un toque por estudiante.",
+    "Al cerrar la clase se completan las descripciones pendientes, aparece el resumen y queda armada la lista para la clase siguiente.",
+    "El consolidado, por semana o por mes, entrega: quiénes más y menos participan, la concentración de turnos, el desglose de fuera de tarea, el mapa de calor por puesto, el resultado de los barridos, la correspondencia con el reglamento interno del establecimiento y la evidencia para sus reconocimientos. Todo exportable a Excel.",
+    "Hay además una vista para proyectar al curso, con meta colectiva y reconocimientos, sin ranking ni conteos individuales."
+  ]);
+  s += bloque("En qué se basa", [
+    "Ninguna categoría de Turnos es una ocurrencia. Cada decisión de diseño viene de una línea de investigación declarada.",
+    "La distinción entre participación voluntaria y participación por llamada directa viene de Flanders y su sistema de análisis de la interacción. Las categorías de fuera de tarea y el muestreo por intervalos en vez de censo, de Shapiro y el instrumento BOSS. Tratar la interacción del profesor como objeto de medición propio, de Pianta y Hamre. Las categorías de trabajo entre pares y el indicador de ayuda aplicada, de Webb y Nelson-Le Gall, que distinguen pedir la respuesta de pedir una explicación. La decisión de no usar «trabajan juntos» como categoría, de Mercer y sus tres tipos de habla. La familia de movimientos del profesor, de Michaels, O’Connor y Resnick. El registro de solo las dimensiones observables del engagement, de Fredricks, Blumenfeld y Paris. El mapa de calor por puesto y, sobre todo, lo que ese mapa no permite concluir, de Adams y Biddle, Sommer, Koneya y Daum.",
+    "El marco normativo es chileno: el Decreto 67/2018 establece que no toda evaluación conduce a calificación, lo que sostiene que estos datos no entren en la nota. La correspondencia con faltas y con reconocimientos se configura según el reglamento interno de cada establecimiento."
+  ]);
+  s += bloque("Límites que la plataforma declara", [
+    "Registra conducta observable. No infiere engagement emocional ni cognitivo.",
+    "Es muestreo, no censo. Los conteos dependen de cuánto registró el profesor, y eso va impreso en el consolidado.",
+    "No determina faltas. El reglamento interno exige registro en la hoja de vida y debido proceso.",
+    "El mapa de sala muestra dónde pasó, no que el puesto lo cause.",
+    "Hubo una corrección durante el diseño: la razón 4:1 de elogios por reprimenda, que suele citarse como norma, no resistió el examen. Una revisión sistemática halló tasas inconsistentes y un análisis sobre 151 salas no encontró umbral. Turnos mide el elogio específico de conducta, que sí tiene respaldo, y no persigue una razón.",
+    "Los datos son locales. No se sincronizan entre dispositivos. Savia Educa no los recibe, no los almacena y no puede recuperarlos si el dispositivo se pierde."
+  ]);
+
+  s += '<button type="button" class="btn ghost wide" data-act="ir" data-v="inicio">Volver</button>';
+  s += '</div></div>';
+  return s;
+}
+
+/* ---- editor de la sala ---- */
+function vistaSala(c){
+  var sala = salaDe(c) || { filas:5, cols:6, asientos:{} };
+  var ocupados = Object.keys(sala.asientos || {}).filter(function(k){ return sala.asientos[k]; }).length;
+  var sp = sinPuesto(c);
+
+  var s = '<header class="topbar"><div class="gut"><div class="toprow">' +
+    '<button type="button" class="icon-btn" data-act="ir" data-v="config" aria-label="Volver">' +
+    '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 2L4 8l6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+    '<div style="flex:1;min-width:0"><b style="font-family:var(--display);font-size:18px;font-weight:800">Mapa de la sala</b>' +
+    '<div style="font-size:12px;color:var(--on-navy-2)">' + h(c.nombre) + ' · ' + ocupados + ' de ' + alumnosDe(c).length + ' ubicados</div></div>' +
+    '</div></div></header>';
+
+  s += '<div class="page"><div class="gut">';
+
+  s += '<section class="card"><h3>Tamaño de la sala</h3><div class="sub">Filas desde la pizarra hacia el fondo</div>' +
+    '<div style="display:flex;gap:16px;flex-wrap:wrap">' +
+    contador("Filas", sala.filas, "filas") + contador("Columnas", sala.cols, "cols") + '</div>' +
+    '<div class="btn-row" style="margin-top:13px">' +
+    '<button type="button" class="btn sm ghost" data-act="sala-llenar">Llenar en orden de lista</button>' +
+    '<button type="button" class="btn sm ghost" data-act="sala-vaciar">Vaciar todo</button></div></section>';
+
+  s += '<section class="card"><h3>Puestos</h3><div class="sub">Toca un puesto para asignar o cambiar al estudiante</div>' +
+    '<div class="sala-scroll"><div class="sala-grid" style="grid-template-columns:repeat(' + sala.cols + ',minmax(58px,1fr))">';
+  for(var fi = sala.filas - 1; fi >= 0; fi--){
+    for(var ci = 0; ci < sala.cols; ci++){
+      var key = fi + "-" + ci;
+      var aid = (sala.asientos || {})[key];
+      var al = aid ? alumno(c, aid) : null;
+      s += '<button type="button" class="seat' + (al ? "" : " vacio") + '" data-act="sala-puesto" data-k="' + key + '">' +
+        (al ? '<b>' + h(corto(al.nombre)) + '</b>' : '<span>' + (fi+1) + '·' + (ci+1) + '</span>') +
+        (al ? '<span class="pos">' + (fi+1) + '·' + (ci+1) + '</span>' : '') + '</button>';
+    }
+  }
+  s += '</div></div><div class="pizarra">Pizarra</div></section>';
+
+  if(sp.length){
+    s += '<section class="card"><h3>Sin puesto · ' + sp.length + '</h3>' +
+      '<div class="sub">Aparecen igual en la clase, en una fila aparte bajo el mapa</div>' +
+      '<div class="chips">' + sp.map(function(a){ return '<span class="chip-n">' + h(corto(a.nombre)) + '</span>'; }).join("") + '</div></section>';
+  }
+
+  s += '<div class="aviso">' + iconoInfo() + '<span>Cada registro guarda el puesto del momento, así que puedes reordenar la sala cuando quieras sin que se corrompa el historial.</span></div>';
+  s += '</div></div>';
+  return s;
+}
+function contador(etiqueta, valor, campo){
+  return '<div><div class="eyebrow" style="color:var(--fg-2);margin-bottom:6px">' + h(etiqueta) + '</div>' +
+    '<div style="display:flex;align-items:center;gap:10px">' +
+    '<button type="button" class="nom-del" data-act="sala-menos" data-k="' + campo + '" aria-label="Quitar ' + h(etiqueta.toLowerCase()) + '" style="width:40px;height:40px;font-size:18px;font-weight:700">−</button>' +
+    '<b class="num" style="font-family:var(--display);font-size:20px;font-weight:800;min-width:24px;text-align:center">' + valor + '</b>' +
+    '<button type="button" class="nom-del" data-act="sala-mas" data-k="' + campo + '" aria-label="Agregar ' + h(etiqueta.toLowerCase()) + '" style="width:40px;height:40px;font-size:18px;font-weight:700">+</button>' +
+    '</div></div>';
+}
+
+/* ---- barrido de práctica ---- */
+function vistaBarrido(c){
+  var cl = asegurarClase();
+  var fase = FASES.filter(function(f){ return f.id === cl.fase; })[0] || FASES[0];
+  var marcadas = Object.keys(barrido.marcas).length;
+  var total = alumnosDe(c).length;
+
+  var s = '<header class="topbar"><div class="gut">';
+  s += '<div class="toprow"><div style="flex:1;min-width:0">' +
+    '<b style="font-family:var(--display);font-size:18px;font-weight:800">Barrido de práctica</b>' +
+    '<div style="font-size:12px;color:var(--on-navy-2)">' + h(fase.t) + ' · ' + marcadas + ' de ' + total + ' revisados</div></div>' +
+    '<button type="button" class="icon-btn" data-act="barrido-cancel" aria-label="Cancelar barrido">' +
+    '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button></div>';
+  s += '</div></header>';
+
+  s += '<div class="gut" style="padding-block:13px 0">';
+  s += '<div class="pinceles" role="group" aria-label="Estado a aplicar">';
+  BARRIDO.forEach(function(b){
+    var on = barrido.pincel === b.id;
+    s += '<button type="button" class="pincel" aria-pressed="' + (on?"true":"false") + '" data-act="pincel" data-id="' + b.id + '" ' +
+      'style="background:var(--' + b.tok + '-wash);color:var(--' + b.tok + '-ink)">' +
+      '<span class="g" style="background:var(--' + b.tok + '-dot);color:var(--surface)">' + b.g + '</span>' +
+      '<span style="min-width:0">' + h(b.t) + '</span></button>';
+  });
+  s += '</div>';
+  s += '<p class="dato" style="margin-top:10px">Toca a cada estudiante para aplicarle el estado marcado. Toca de nuevo para borrarlo. Los que no marques quedan como <b>no revisados</b>, que no es lo mismo que no trabajar.</p>';
+  s += '</div>';
+
+  s += '<main class="gut"><div class="grid">';
+  alumnosDe(c).forEach(function(a){
+    var m = barrido.marcas[a.id];
+    var b = m ? BAR_BY_ID[m] : null;
+    s += '<button type="button" class="tile" data-act="barrido-marca" data-id="' + a.id + '"' +
+      (b ? ' style="background:var(--' + b.tok + '-wash);border-color:var(--' + b.tok + '-dot)"' : '') +
+      ' aria-label="' + h(corto(a.nombre)) + (b ? ": " + h(b.t) : ": sin revisar") + '">' +
+      '<b style="padding-right:16px">' + h(corto(a.nombre)) + '</b>' +
+      (b ? '<span class="badge" style="background:var(--' + b.tok + '-dot);color:var(--surface)">' + b.g + '</span>' : '') +
+      '</button>';
+  });
+  s += '</div></main>';
+
+  s += '<div class="footbar"><div class="gut"><div class="meta">' +
+    '<small>Sin revisar</small><b class="num">' + (total - marcadas) + (total - marcadas === 1 ? " estudiante" : " estudiantes") + '</b></div>' +
+    '<button type="button" class="btn" data-act="barrido-ok"' + (marcadas ? "" : " disabled") + '>Guardar barrido</button></div></div>';
+  return s;
+}
+
+/* ---- hoja de acciones ---- */
+function hojaAcciones(c, alumnoId){
+  var cl = asegurarClase();
+  var a = alumno(c, alumnoId); if(!a) return "";
+  var fase = FASES.filter(function(f){ return f.id === cl.fase; })[0] || FASES[0];
+  var hoy = {};
+  regsDeClase(cl.id).filter(function(r){ return r.alumnoId === alumnoId; }).forEach(function(r){ hoy[r.accionId] = (hoy[r.accionId]||0)+1; });
+  var nHoy = Object.keys(hoy).reduce(function(t,k){ return t + hoy[k]; }, 0);
+
+  var s = '<div class="sheet-bg" data-act="cerrar-hoja"></div><div class="sheet" role="dialog" aria-label="Registrar para ' + h(a.nombre) + '">';
+  s += '<div class="sheet-head"><div class="gut"><div class="sheet-title"><div style="min-width:0">' +
+    '<h2>' + h(corto(a.nombre)) + '</h2><small>' + h(fase.t) + ' · ' + hora(Date.now()) + ' · ' +
+    (nHoy ? nHoy + (nHoy===1?" registro":" registros") + " hoy" : "sin registros hoy") + '</small></div>' +
+    '<button type="button" class="icon-btn" data-act="cerrar-hoja" aria-label="Cerrar" style="background:var(--surface-2);color:var(--fg)">' +
+    '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button></div>';
+  if(cl.grupal) s += '<div class="note"><i></i><span>Trabajo grupal activo: lo que marques como fuera de tarea queda con esa marca.</span></div>';
+  s += '</div></div>';
+
+  s += '<div class="sheet-body"><div class="gut">';
+  FAMILIAS.forEach(function(f){
+    s += '<section class="fam"><div class="fam-head"><i style="background:var(--' + f.id + '-dot)"></i><h3>' + h(f.t) + '</h3></div>' +
+      '<p>' + h(f.pie) + '</p><div class="acts">';
+    ACCIONES.filter(function(x){ return x.f === f.id; }).forEach(function(x){
+      s += '<button type="button" class="act" style="background:var(--' + f.id + '-wash);color:var(--' + f.id + '-ink)" data-act="reg" data-id="' + alumnoId + '" data-a="' + x.id + '">' +
+        (x.mc && x.id === "p-vol-err" ? estrellaSVG(13, "var(--fdt-dot)") : "") +
+        '<span style="min-width:0">' + h(x.t) + '</span>' +
+        (hoy[x.id] ? '<span class="hoy">' + hoy[x.id] + '</span>' : '') + '</button>';
+    });
+    s += '</div></section>';
+  });
+  s += '</div></div></div>';
+  return s;
+}
+
+/* ---- vista cierre ---- */
+function vistaCierre(c){
+  var cl = asegurarClase();
+  var regs = regsDeClase(cl.id);
+  var pend = regs.filter(function(r){ var a = ACC_BY_ID[r.accionId]; return a && a.otro && !String(r.nota||"").trim(); });
+  var sinNada = alumnosDe(c).filter(function(a){ return !regs.some(function(r){ return r.alumnoId === a.id; }); });
+  var elogios = regs.filter(function(r){ var a = ACC_BY_ID[r.accionId]; return a && a.elogioEsp; }).length;
+  var atenciones = regs.filter(function(r){ return r.accionId === "d-atencion"; }).length;
+  var fdt = regs.filter(function(r){ var a = ACC_BY_ID[r.accionId]; return a && a.f === "fdt"; });
+  var porFase = {};
+  fdt.forEach(function(r){ porFase[r.fase] = (porFase[r.fase]||0)+1; });
+  var faseTop = Object.keys(porFase).sort(function(a,b){ return porFase[b]-porFase[a]; })[0];
+  var faseTopT = faseTop ? (FASES.filter(function(f){ return f.id === faseTop; })[0]||{}).t : null;
+  var prio = prioridad(c, cl);
+
+  var s = "";
+  s += '<header class="topbar"><div class="gut"><div class="toprow">' +
+    '<button type="button" class="icon-btn" data-act="ir" data-v="clase" aria-label="Volver a la clase">' +
+    '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 2L4 8l6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+    '<div style="flex:1;min-width:0"><b style="font-family:var(--display);font-size:17px;font-weight:800">Cierre de clase</b>' +
+    '<div style="font-size:12px;color:var(--on-navy-2)">' + h(c.nombre) + ' · ' + fechaLarga(cl.fecha) + ' · ' + hora(Date.now()) + '</div></div>' +
+    '</div></div></header>';
+
+  s += '<div class="page"><div class="gut">';
+
+  if(pend.length){
+    s += '<section class="card warn"><h3>Pendientes por describir · ' + pend.length + '</h3>' +
+      '<div class="sub" style="color:var(--orange-ink)">Marcaste "Otro" durante la clase. Escribe qué pasó antes de cerrar.</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px">';
+    pend.forEach(function(r){
+      var al = alumno(c, r.alumnoId); var a = ACC_BY_ID[r.accionId];
+      s += '<div class="pend"><label for="n-' + r.id + '">' + h(corto(al?al.nombre:"")) + ' · ' + h(FAM_BY_ID[a.f].t) + ' · ' + hora(r.ts) + '</label>' +
+        '<input type="text" id="n-' + r.id + '" data-nota="' + r.id + '" placeholder="¿Qué pasó?" value="' + h(r.nota||"") + '"></div>';
+    });
+    s += '</div></section>';
+  }
+
+  s += '<section class="card"><h3>Resumen de la clase</h3><div class="sub">' + regs.length + ' registros en ' + alumnosDe(c).length + ' estudiantes</div>' +
+    '<div class="stats">' +
+    stat(regs.filter(function(r){ var a=ACC_BY_ID[r.accionId]; return a && a.f==="par"; }).length, "registros de participación", "par") +
+    stat(sinNada.length, "sin ningún registro", "fdt") +
+    stat(elogios, "veces que felicitaste nombrando la conducta", "doc") +
+    stat(atenciones, "llamados de atención", "doc") +
+    '</div>';
+  if(faseTopT && fdt.length) s += '<p style="margin:11px 0 0;font-size:11.5px;line-height:1.45;color:var(--fg-2)">El fuera de tarea se concentró en ' + h(faseTopT) + ': ' + porFase[faseTop] + ' de ' + fdt.length + ' registros.</p>';
+  if(sinNada.length) s += '<p style="margin:9px 0 0;font-size:11.5px;line-height:1.45;color:var(--fg-2)">Sin registro hoy: ' + sinNada.map(function(a){ return h(corto(a.nombre)); }).join(", ") + '.</p>';
+  s += '</section>';
+
+  s += '<section class="card"><h3>Próxima clase: pregúntale a</h3><div class="sub">El 10% del curso con menos participación</div>';
+  prio.forEach(function(p){
+    s += '<div class="row"><i></i><b>' + h(corto(p.nombre)) + '</b><small>' + h(razon(p)) + '</small></div>';
+  });
+  s += '</section>';
+
+  s += '<button type="button" class="btn ghost wide" data-act="ir" data-v="consolidado">Ver el consolidado del curso</button>';
+
+  s += '</div></div>';
+  s += '<div class="footbar"><div class="gut">' +
+    '<span class="meta" style="font-size:11.5px;line-height:1.35;color:var(--fg-2)">' +
+    (pend.length ? "Completa los " + pend.length + " pendientes para cerrar" : "Todo listo. Al cerrar, la clase queda guardada.") + '</span>' +
+    '<button type="button" class="btn" data-act="cerrar-clase"' + (pend.length ? " disabled" : "") + '>Guardar y cerrar</button></div></div>';
+  return s;
+}
+function stat(v, t, tok){
+  return '<div class="stat" style="background:var(--' + tok + '-wash);color:var(--' + tok + '-ink)"><b>' + v + '</b><small>' + h(t) + '</small></div>';
+}
+
+/* ---- consolidado ---- */
+var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+function rangoPeriodo(p){
+  var ahora = new Date();
+  if(p === "mes"){
+    return { desde:new Date(ahora.getFullYear(), ahora.getMonth(), 1).getTime(), t:MESES[ahora.getMonth()] + " de " + ahora.getFullYear() };
+  }
+  if(p === "todo"){ return { desde:0, t:"todo el historial" }; }
+  var d = new Date(ahora); d.setHours(0,0,0,0);
+  var lun = new Date(d); lun.setDate(d.getDate() - (d.getDay() || 7) + 1);
+  return { desde:lun.getTime(), t:rangoSemana(ahora).toLowerCase() };
+}
+
+function consolidar(c, p){
+  var r = rangoPeriodo(p);
+  var regs = DB.registros.filter(function(x){ return x.cursoId === c.id && x.ts >= r.desde; });
+  var set = {}; regs.forEach(function(x){ set[x.claseId] = true; });
+  var A = {};
+  alumnosDe(c).forEach(function(a){
+    A[a.id] = { id:a.id, n:corto(a.nombre), vol:0, llam:0, fdt:0, motor:0, verbal:0, pasivo:0,
+                noIni:0, noResp:0, aten:0, explica:0, daResp:0, aplica:0, total:0, acc:{},
+                bar:{ ok:0, err:0, av:0, no:0, tot:0 } };
+  });
+  var barridos = DB.barridos.filter(function(b){ return b.cursoId === c.id && b.ts >= r.desde; });
+  var barTot = { ok:0, err:0, av:0, no:0 };
+  barridos.forEach(function(b){
+    Object.keys(b.marcas || {}).forEach(function(aid){
+      var o = A[aid], e = b.marcas[aid];
+      if(!o || o.bar[e] === undefined) return;
+      o.bar[e]++; o.bar.tot++; barTot[e]++;
+    });
+  });
+  var elogEsp = 0, elogGen = 0, norma = 0, fasesFdt = {}, totExplica = 0, totDaResp = 0, totAplica = 0;
+  regs.forEach(function(x){
+    var a = ACC_BY_ID[x.accionId], o = A[x.alumnoId];
+    if(!a || !o) return;
+    o.total++;
+    o.acc[x.accionId] = (o.acc[x.accionId] || 0) + 1;
+    if(a.f === "par"){ if(a.k === "voluntaria") o.vol++; if(a.k === "llamada") o.llam++; }
+    if(a.f === "fdt"){ o.fdt++; if(a.boss) o[a.boss]++; fasesFdt[x.fase] = (fasesFdt[x.fase]||0)+1; }
+    if(x.accionId === "f-noini") o.noIni++;
+    if(x.accionId === "p-dir-no") o.noResp++;
+    if(x.accionId === "d-atencion") o.aten++;
+    if(x.accionId === "d-elog-esp") elogEsp++;
+    if(x.accionId === "d-elog-gen") elogGen++;
+    if(x.accionId === "d-norma") norma++;
+    if(x.accionId === "e-explica"){ o.explica++; totExplica++; }
+    if(x.accionId === "e-da-resp"){ o.daResp++; totDaResp++; }
+    if(x.accionId === "e-aplica"){ o.aplica++; totAplica++; }
+  });
+  var arr = Object.keys(A).map(function(k){ return A[k]; });
+  arr.forEach(function(o){ o.turnos = o.vol + o.llam; o.noSigue = o.noIni + o.noResp + o.aten; });
+  var totTurnos = arr.reduce(function(s,o){ return s + o.turnos; }, 0);
+  var orden = arr.slice().sort(function(a,b){ return b.turnos - a.turnos; });
+  var tercio = Math.max(1, Math.ceil(arr.length / 3));
+  var concTurnos = totTurnos ? Math.round(orden.slice(0,tercio).reduce(function(s,o){ return s + o.turnos; }, 0) / totTurnos * 100) : 0;
+  var totLlam = arr.reduce(function(s,o){ return s + o.llam; }, 0);
+  var ordLlam = arr.slice().sort(function(a,b){ return b.llam - a.llam; });
+  var concLlam = totLlam ? Math.round(ordLlam.slice(0,tercio).reduce(function(s,o){ return s + o.llam; }, 0) / totLlam * 100) : 0;
+  var faseTop = Object.keys(fasesFdt).sort(function(a,b){ return fasesFdt[b] - fasesFdt[a]; })[0];
+  return {
+    etiqueta:r.t, regs:regs, nClases:Object.keys(set).length, nRegs:regs.length, arr:arr, orden:orden,
+    sinNada:arr.filter(function(o){ return !o.total; }), totTurnos:totTurnos, concTurnos:concTurnos,
+    concLlam:concLlam, tercio:tercio, nuncaLlamados:arr.filter(function(o){ return !o.llam; }),
+    elogEsp:elogEsp, elogGen:elogGen, norma:norma, faseTop:faseTop, fasesFdt:fasesFdt,
+    totFdt:arr.reduce(function(s,o){ return s + o.fdt; }, 0),
+    totExplica:totExplica, totDaResp:totDaResp, totAplica:totAplica,
+    barridos:barridos, barTot:barTot
+  };
+}
+
+function barras(items, tok, n){
+  var top = items.filter(function(x){ return x.v > 0; }).slice(0, n || 6);
+  if(!top.length) return '<p class="vacio">Sin registros de este tipo en el periodo.</p>';
+  var max = top[0].v || 1;
+  return top.map(function(x){
+    var pct = Math.max(5, Math.round(x.v / max * 100));
+    return '<div class="bar-row"><div class="bar-top"><span class="bar-n">' + h(x.n) + '</span><span class="bar-v">' + x.v + '</span></div>' +
+      '<div class="bar-track"><i style="width:' + pct + '%;background:var(--' + tok + '-dot)"></i></div>' +
+      (x.d ? '<div class="bar-d">' + h(x.d) + '</div>' : '') + '</div>';
+  }).join("");
+}
+
+function vistaConsolidado(c){
+  var k = consolidar(c, periodo);
+  var s = "";
+  s += '<header class="topbar"><div class="gut"><div class="toprow">' +
+    '<button type="button" class="icon-btn" data-act="ir" data-v="clase" aria-label="Volver">' +
+    '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 2L4 8l6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+    '<div style="flex:1;min-width:0"><b style="font-family:var(--display);font-size:18px;font-weight:800">Consolidado</b>' +
+    '<div style="font-size:12px;color:var(--on-navy-2)">' + h(c.nombre) + ' · ' + h(k.etiqueta) + '</div></div>' +
+    '</div></div></header>';
+
+  s += '<div class="page"><div class="gut">';
+
+  s += '<div class="seg" role="group" aria-label="Periodo">' +
+    ['semana','mes','todo'].map(function(p){
+      return '<button type="button" aria-pressed="' + (periodo === p ? "true":"false") + '" data-act="periodo" data-p="' + p + '">' +
+        (p === "semana" ? "Esta semana" : p === "mes" ? "Este mes" : "Todo") + '</button>';
+    }).join("") + '</div>';
+
+  s += '<div class="aviso"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="8" cy="8" r="6.6" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.6v4.2M8 11.1v.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
+    '<span><b>Pantalla privada: no la proyectes.</b> Y lee los números con cuidado: dependen de cuánto registraste, no solo de lo que pasó. Una clase en que circulaste harto no es comparable con otra en que no.</span></div>';
+
+  s += '<section class="card"><h3>Resumen del periodo</h3><div class="sub">' + h(k.etiqueta) + '</div><div class="stats">' +
+    stat(k.nClases, k.nClases === 1 ? "clase registrada" : "clases registradas", "par") +
+    stat(k.nRegs, "registros en total", "par") +
+    stat(k.nClases ? Math.round(k.nRegs / k.nClases) : 0, "registros por clase", "doc") +
+    stat(k.sinNada.length, "estudiantes sin ningún registro", "fdt") +
+    '</div>';
+  if(k.sinNada.length) s += '<div class="chips">' + k.sinNada.slice(0,12).map(function(o){ return '<span class="chip-n">' + h(o.n) + '</span>'; }).join("") +
+    (k.sinNada.length > 12 ? '<span class="chip-n">y ' + (k.sinNada.length - 12) + ' más</span>' : '') + '</div>';
+  s += '</section>';
+
+  s += '<section class="card"><h3>Quiénes más participan</h3><div class="sub">Turnos de participación: lo voluntario más lo que sale cuando los llamas</div>' +
+    barras(k.orden.map(function(o){ return { n:o.n, v:o.turnos, d:o.vol + " por iniciativa propia · " + o.llam + " porque lo llamaste" }; }), "par") + '</section>';
+
+  var invis = k.arr.slice().sort(function(a,b){ return a.turnos - b.turnos || a.n.localeCompare(b.n,"es"); }).slice(0,6);
+  s += '<section class="card"><h3>Los invisibles</h3><div class="sub">Los que menos aparecieron en el periodo</div>';
+  s += invis.map(function(o){
+    return '<div class="row"><i style="background:var(--' + (o.turnos ? "par" : "fdt") + '-dot)"></i><b>' + h(o.n) + '</b>' +
+      '<small>' + (o.turnos ? o.turnos + (o.turnos === 1 ? " turno" : " turnos") + " en " + k.nClases + (k.nClases === 1 ? " clase" : " clases") : "sin participar en todo el periodo") + '</small></div>';
+  }).join("");
+  s += '<p class="dato">El tercio más activo del curso (' + k.tercio + ' estudiantes) se lleva el <b>' + k.concTurnos + '%</b> de los turnos. Si fuera parejo sería 33%.</p>' +
+    '<div class="meter"><i style="width:' + k.concTurnos + '%;background:var(--par-dot)"></i></div></section>';
+
+  s += '<section class="card"><h3>Fuera de tarea</h3><div class="sub">' + k.totFdt + ' registros en el periodo</div>' +
+    barras(k.arr.slice().sort(function(a,b){ return b.fdt - a.fdt; }).map(function(o){
+      var d = [];
+      if(o.motor) d.push(o.motor + " se levanta o manipula");
+      if(o.verbal) d.push(o.verbal + " conversa o interrumpe");
+      if(o.pasivo) d.push(o.pasivo + " mira a otro lado o no inicia");
+      return { n:o.n, v:o.fdt, d:d.join(" · ") };
+    }), "fdt");
+  if(k.faseTop && k.totFdt){
+    var ft = FASES.filter(function(f){ return f.id === k.faseTop; })[0];
+    s += '<p class="dato">Se concentra en <b>' + h(ft ? ft.t : k.faseTop) + '</b>: ' + k.fasesFdt[k.faseTop] + ' de ' + k.totFdt + ' registros.</p>';
+  }
+  s += '</section>';
+
+  s += '<section class="card"><h3>No inicia la tarea o no responde</h3>' +
+    '<div class="sub">Conducta observada, no etiqueta del estudiante</div>' +
+    barras(k.arr.slice().sort(function(a,b){ return b.noSigue - a.noSigue; }).map(function(o){
+      var d = [];
+      if(o.noIni) d.push(o.noIni + " no empieza la tarea");
+      if(o.noResp) d.push(o.noResp + " no responde al llamarlo");
+      if(o.aten) d.push(o.aten + " llamados de atención");
+      return { n:o.n, v:o.noSigue, d:d.join(" · ") };
+    }), "fdt") + '</section>';
+
+  s += '<section class="card"><h3>Entre pares</h3><div class="sub">Solo cuenta lo que alcanzaste a escuchar circulando</div>' +
+    barras(k.arr.slice().sort(function(a,b){ return (b.explica + b.aplica) - (a.explica + a.aplica); }).map(function(o){
+      var d = [];
+      if(o.explica) d.push(o.explica + " explica");
+      if(o.daResp) d.push(o.daResp + " pasa la respuesta");
+      if(o.aplica) d.push(o.aplica + " usa la ayuda recibida");
+      return { n:o.n, v:o.explica + o.aplica, d:d.join(" · ") };
+    }), "pares");
+  if(k.totExplica + k.totDaResp){
+    s += '<p class="dato">En el curso hubo <b>' + k.totExplica + '</b> explicaciones contra <b>' + k.totDaResp + '</b> respuestas pasadas sin explicar. ' +
+      'La evidencia dice que quien explica con elaboración es el que más aprende, y que el que recibe solo gana si aplica la ayuda: eso pasó <b>' + k.totAplica + '</b> veces.</p>';
+  }
+  s += '</section>';
+
+  s += '<section class="card"><h3>Tu práctica</h3><div class="sub">Esto no mide a los estudiantes, te mide a ti</div>' +
+    barras([
+      { n:"Felicitaste nombrando qué hizo", v:k.elogEsp, d:"Es la forma que tiene respaldo, no una razón fija de elogios por reprimenda" },
+      { n:"Felicitaste en general", v:k.elogGen },
+      { n:"Recordaste la norma antes de la falta", v:k.norma }
+    ], "doc", 3);
+  s += '<p class="dato">Tus llamadas directas se concentran en el tercio más llamado en un <b>' + k.concLlam + '%</b>.</p>' +
+    '<div class="meter"><i style="width:' + k.concLlam + '%;background:var(--doc-dot)"></i></div>';
+  if(k.nuncaLlamados.length){
+    s += '<p class="dato">No llamaste nunca a <b>' + k.nuncaLlamados.length + '</b> estudiantes en el periodo:</p>' +
+      '<div class="chips">' + k.nuncaLlamados.slice(0,12).map(function(o){ return '<span class="chip-n">' + h(o.n) + '</span>'; }).join("") +
+      (k.nuncaLlamados.length > 12 ? '<span class="chip-n">y ' + (k.nuncaLlamados.length - 12) + ' más</span>' : '') + '</div>';
+  }
+  s += '</section>';
+
+  s += seccionSala(c, k);
+  s += seccionBarridos(k);
+  s += seccionSugerencias(k);
+
+  s += '<button type="button" class="btn ghost wide" data-act="ir" data-v="config" data-sec="respaldo">Exportar todo a Excel</button>';
+  s += '</div></div>';
+  return s;
+}
+
+function iconoInfo(){
+  return '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.6" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.6v4.2M8 11.1v.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+}
+
+function seccionSala(c, k){
+  var s = '<section class="card"><h3>Mapa de participación</h3><div class="sub">Dónde cayeron los turnos de participación</div>';
+  var sala = salaDe(c);
+  if(!sala) return s + '<p class="vacio">Todavía no armas el mapa de la sala. Se arma desde Ajustes.</p></section>';
+
+  var porAsiento = {}, max = 0, ubicados = 0;
+  k.regs.forEach(function(x){
+    var a = ACC_BY_ID[x.accionId]; if(!a || a.f !== "par") return;
+    var key = x.asiento || asientoDe(c, x.alumnoId);
+    if(!key) return;
+    porAsiento[key] = (porAsiento[key] || 0) + 1;
+    if(porAsiento[key] > max) max = porAsiento[key];
+    ubicados++;
+  });
+  if(!ubicados) return s + '<p class="vacio">Sin turnos de participación con puesto registrado en el periodo.</p></section>';
+
+  s += '<div class="sala-scroll"><div class="sala-grid" style="grid-template-columns:repeat(' + sala.cols + ',minmax(46px,1fr))">';
+  for(var fi = sala.filas - 1; fi >= 0; fi--){
+    for(var ci = 0; ci < sala.cols; ci++){
+      var key = fi + "-" + ci;
+      if(!(sala.asientos || {})[key]){ s += '<div class="heat vacio"></div>'; continue; }
+      var v = porAsiento[key] || 0;
+      var al = max ? v / max : 0;
+      var fondo = v ? Math.max(0.09, al) : 0;
+      s += '<div class="heat" style="background:rgba(var(--heat-rgb),' + fondo.toFixed(2) + ');color:' + (fondo > 0.55 ? "var(--heat-hi)" : "var(--heat-lo)") + '">' + v + '</div>';
+    }
+  }
+  s += '</div></div><div class="pizarra">Pizarra</div>';
+  s += '<div class="leyenda"><span>menos</span><span class="esc">' +
+    [0.09,0.3,0.5,0.7,0.9].map(function(a){ return '<i style="background:rgba(var(--heat-rgb),' + a + ')"></i>'; }).join("") +
+    '</span><span>más</span></div>';
+
+  function zona(test){
+    var n = 0, tot = 0;
+    for(var f = 0; f < sala.filas; f++){
+      for(var cc = 0; cc < sala.cols; cc++){
+        var kk = f + "-" + cc;
+        if(!(sala.asientos || {})[kk] || !test(f, cc)) continue;
+        n++; tot += porAsiento[kk] || 0;
+      }
+    }
+    return { n:n, prom: n ? tot / n : 0 };
+  }
+  function prom(z){ return z.n ? (Math.round(z.prom * 10) / 10) : "—"; }
+
+  var c1 = Math.ceil(sala.filas / 3), c2 = Math.ceil(sala.filas * 2 / 3);
+  var del = zona(function(f){ return f < c1; });
+  var cen = zona(function(f){ return f >= c1 && f < c2; });
+  var tra = zona(function(f){ return f >= c2; });
+  s += '<div style="margin-top:14px"><div class="eyebrow" style="color:var(--fg-2);margin-bottom:3px">Por distancia a la pizarra</div>' +
+    '<p class="dato" style="margin:0">Turnos promedio por estudiante sentado en cada zona</p><div class="zonas">' +
+    '<div class="zona"><b>' + prom(del) + '</b><small>Adelante · ' + del.n + ' puestos</small></div>' +
+    '<div class="zona"><b>' + prom(cen) + '</b><small>Al medio · ' + cen.n + ' puestos</small></div>' +
+    '<div class="zona"><b>' + prom(tra) + '</b><small>Atrás · ' + tra.n + ' puestos</small></div>' +
+    '</div></div>';
+
+  var k1 = Math.ceil(sala.cols / 3), k2 = Math.ceil(sala.cols * 2 / 3);
+  var izq = zona(function(f, cc){ return cc < k1; });
+  var med = zona(function(f, cc){ return cc >= k1 && cc < k2; });
+  var der = zona(function(f, cc){ return cc >= k2; });
+  s += '<div style="margin-top:13px"><div class="eyebrow" style="color:var(--fg-2);margin-bottom:3px">Por columna</div>' +
+    '<div class="zonas">' +
+    '<div class="zona"><b>' + prom(izq) + '</b><small>Izquierda · ' + izq.n + ' puestos</small></div>' +
+    '<div class="zona"><b>' + prom(med) + '</b><small>Centro · ' + med.n + ' puestos</small></div>' +
+    '<div class="zona"><b>' + prom(der) + '</b><small>Derecha · ' + der.n + ' puestos</small></div>' +
+    '</div></div>';
+
+  s += '<div class="aviso" style="margin-top:14px">' + iconoInfo() + '<span><b>El mapa muestra dónde pasó, no que el puesto lo haya causado.</b> ' +
+    'Adams y Biddle (1970) describieron un centro de actividad que va del frente por la línea central, con la interacción debilitándose al alejarse del profesor, y Sommer encontró más participación en la primera fila y al centro de cada fila. ' +
+    'Pero Koneya (1973), asignando asientos al azar, vio que los estudiantes ya identificados como poco verbales no hablaron más por quedar en un puesto de alta participación. ' +
+    'Si tus estudiantes eligen dónde sentarse, este mapa te está mostrando dónde se sientan los que ya participaban.</span></div>';
+
+  s += '<p class="dato">Lo que sí tiene respaldo experimental: Daum encontró que, con asientos asignados y controlando el rendimiento previo, los estudiantes de bajo rendimiento previo mejoraron al ubicarlos adelante, mientras que los de alto rendimiento rindieron igual en cualquier parte.</p>';
+  return s + '</section>';
+}
+
+/* Agrupa por función de la conducta, no por valencia: qué sostiene lo que se ve
+   decide qué sirve. Umbrales explícitos y visibles para que el profesor los juzgue. */
+function sugerencias(k){
+  var orden = k.arr.map(function(o){ return o.turnos; }).sort(function(a,b){ return a-b; });
+  var mediana = orden.length ? orden[Math.floor(orden.length / 2)] : 0;
+  var g = { g1:[], g2:[], g3:[], g4:[] };
+  k.arr.forEach(function(o){
+    var conBarrido = o.bar.tot >= 2;
+    var malTarea = conBarrido && (o.bar.err + o.bar.no) > o.bar.ok;
+    var disruptivo = (o.fdt + o.aten) >= 3;
+    if(malTarea){ g.g4.push(o); return; }
+    if(disruptivo){ g.g3.push(o); return; }
+    if(o.turnos < mediana || o.turnos === 0){ g.g2.push(o); return; }
+    o.rec = (o.acc["p-vol-err"]||0) + (o.acc["p-preg"]||0) + (o.acc["e-explica"]||0) + (o.acc["e-aplica"]||0);
+    g.g1.push(o);
+  });
+  g.mediana = mediana;
+  return g;
+}
+
+function grupoCard(titulo, tok, accion, evidencia, lista, razon){
+  var s = '<section class="card"><div class="fam-head"><i style="background:var(--' + tok + '-dot)"></i>' +
+    '<h3>' + h(titulo) + '</h3></div>' +
+    '<p class="dato" style="margin:6px 0 0 17px"><b>Qué hacer:</b> ' + accion + '</p>' +
+    '<p class="dato" style="margin:5px 0 10px 17px">' + evidencia + '</p>';
+  if(!lista.length) return s + '<p class="vacio">Nadie en este grupo en el periodo.</p></section>';
+  lista.slice(0, 8).forEach(function(o){
+    s += '<div class="row"><i style="background:var(--' + tok + '-dot)"></i><b>' + h(o.n) + '</b><small>' + h(razon(o)) + '</small></div>';
+  });
+  if(lista.length > 8) s += '<p class="dato">y ' + (lista.length - 8) + ' más.</p>';
+  return s + '</section>';
+}
+
+function seccionSugerencias(k){
+  if(!k.nRegs && !k.barridos.length){
+    return '<section class="card"><h3>Sugerencia de acción</h3>' +
+      '<div class="sub">Agrupados por qué sostiene la conducta, no por si es buena o mala</div>' +
+      '<p class="vacio">Sin registros en el periodo. Con una o dos clases registradas ya aparecen los grupos.</p></section>';
+  }
+  var g = sugerencias(k);
+  var total = k.arr.length;
+  var apoyo = g.g3.length + g.g4.length;
+  var pct = total ? Math.round(apoyo / total * 100) : 0;
+
+  var s = '<section class="card"><h3>Sugerencia de acción</h3>' +
+    '<div class="sub">Agrupados por qué sostiene la conducta, no por si es buena o mala</div>' +
+    '<div class="aviso">' + iconoInfo() + '<span>Los grupos salen de umbrales fijos, y un estudiante sin ningún registro cuenta como invisible, no como sin datos. ' +
+    'Poca participación es estar bajo la mediana del curso, que en este periodo fue de <b>' + g.mediana + '</b> turnos. ' +
+    'Patrón disruptivo es acumular 3 o más registros entre fuera de tarea y llamados de atención. ' +
+    'La tarea se evalúa solo con 2 o más barridos.</span></div></section>';
+
+  s += grupoCard("Reconocer", "ok",
+    "Elogio específico nombrando la conducta concreta, y proponerlos para los reconocimientos del colegio.",
+    "Participan y, cuando revisas, la tarea les sale. El elogio que tiene respaldo es el que nombra la conducta, no el general.",
+    g.g1.sort(function(a,b){ return (b.rec||0) - (a.rec||0) || b.turnos - a.turnos; }),
+    function(o){
+      var p = [o.turnos + " turnos"];
+      if(o.acc["p-vol-err"] || o.acc["p-preg"]) p.push("participa aunque se equivoque");
+      if(o.acc["e-explica"]) p.push("explica a compañeros");
+      if(o.bar.ok) p.push(o.bar.ok + " veces la tarea correcta");
+      return p.join(" · ");
+    });
+
+  s += grupoCard("Darle más turnos", "av",
+    "Aumentar las oportunidades de respuesta dirigidas. La franja de prioridad ya lo hace: úsala.",
+    "No aparecen en los registros, pero cuando trabajan lo hacen bien. No es conducta: no les está llegando el turno. Una revisión de 15 estudios halló apoyo creciente para esta práctica a nivel de curso, con más conducta en tarea y más participación; los estudios con resultados positivos usaron entre 3 y 5 oportunidades por minuto, y ninguno identificó una tasa óptima.",
+    g.g2.sort(function(a,b){ return a.turnos - b.turnos; }),
+    function(o){
+      return o.turnos === 0 ? "sin participar en el periodo" : o.turnos + " turnos, bajo la mediana de " + g.mediana;
+    });
+
+  s += grupoCard("Apoyo conductual estructurado", "err",
+    "Monitoreo diario con retroalimentación pautada, del tipo check-in y check-out.",
+    "Interrumpen o se desconectan, pero cuando trabajan les sale bien: la conducta no viene de no saber. El check-in/check-out está revisado como práctica basada en evidencia dentro de PBIS y es especialmente efectivo cuando la conducta se mantiene por la atención del adulto.",
+    g.g3.sort(function(a,b){ return (b.fdt + b.aten) - (a.fdt + a.aten); }),
+    function(o){
+      var p = [o.fdt + " fuera de tarea"];
+      if(o.aten) p.push(o.aten + " llamados de atención");
+      if(o.bar.ok) p.push("pero la tarea le sale " + o.bar.ok + " de " + o.bar.tot);
+      return p.join(" · ");
+    });
+
+  s += grupoCard("No es conducta, es la tarea", "no",
+    "Apoyo académico: revisar el prerrequisito, no la conducta.",
+    "No empiezan, o terminan con errores. Esta es la distinción que importa: la evidencia del check-in/check-out cubre la conducta mantenida por atención y no dice nada sobre la que busca escapar de la tarea. Aplicarles esa herramienta es equivocarse de problema.",
+    g.g4.sort(function(a,b){ return (b.bar.err + b.bar.no) - (a.bar.err + a.bar.no); }),
+    function(o){
+      var p = [];
+      if(o.bar.err) p.push(o.bar.err + " veces terminó con errores");
+      if(o.bar.no) p.push(o.bar.no + " veces no empezó");
+      p.push("de " + o.bar.tot + " revisiones");
+      return p.join(" · ");
+    });
+
+  s += '<section class="card"><h3>Control de cordura</h3>' +
+    '<div class="sub">Si demasiados caen en los dos últimos grupos, el problema no son ellos</div>' +
+    '<p class="dato">En PBIS se espera que cerca del <b>80%</b> responda al nivel universal, entre <b>10 y 15%</b> necesite apoyo de nivel 2 y alrededor del <b>5%</b> requiera intervención individualizada.</p>' +
+    '<div class="stats" style="margin-top:10px">' +
+    stat(pct + "%", "del curso en los dos grupos de apoyo", pct > 15 ? "err" : "ok") +
+    stat(apoyo + " de " + total, "estudiantes", "av") + '</div>';
+  if(pct > 15) s += '<div class="alerta">' + iconoInfo() + '<span><b>Son más de los esperables.</b> Antes de armar apoyos individuales, mira qué pasa en el nivel universal: cómo repartes los turnos, en qué fase se cae la clase, y si la tarea está al nivel del curso.</span></div>';
+  return s + '</section>';
+}
+
+function seccionBarridos(k){
+  var s = '<section class="card"><h3>Práctica autónoma</h3>' +
+    '<div class="sub">' + k.barridos.length + (k.barridos.length === 1 ? " barrido" : " barridos") + ' en el periodo</div>';
+  if(!k.barridos.length){
+    return s + '<p class="vacio">Todavía no has hecho barridos. El botón sale en las fases de Acompañamiento y Autonomía.</p></section>';
+  }
+  var revisados = k.arr.filter(function(o){ return o.bar.tot; });
+  s += barras(BARRIDO.map(function(b){ return { n:b.t, v:k.barTot[b.id] }; }), "av", 4);
+  s += '<p class="dato">' + revisados.length + ' de ' + k.arr.length + ' estudiantes fueron revisados al menos una vez. ' +
+    'Los demás no aparecen porque no alcanzaste a mirarlos, no porque no trabajaran.</p>';
+
+  var conError = k.arr.filter(function(o){ return o.bar.err > 0 && o.bar.err >= o.bar.ok; })
+    .sort(function(a,b){ return b.bar.err - a.bar.err; }).slice(0, 6);
+  if(conError.length){
+    s += '<div style="margin-top:14px"><div class="eyebrow" style="color:var(--err-ink);margin-bottom:3px">Terminan, pero con errores</div>' +
+      '<p class="dato" style="margin:0 0 7px">Este es el grupo que se escapa: alcanzan a terminar, así que a simple vista parecen bien.</p>' +
+      barras(conError.map(function(o){ return { n:o.n, v:o.bar.err, d:o.bar.ok + " veces correcto · " + o.bar.err + " con errores" }; }), "err") + '</div>';
+  }
+  var noEmp = k.arr.filter(function(o){ return o.bar.no >= 2; }).sort(function(a,b){ return b.bar.no - a.bar.no; }).slice(0, 6);
+  if(noEmp.length){
+    s += '<div style="margin-top:14px"><div class="eyebrow" style="color:var(--no-ink);margin-bottom:7px">No empezó, en más de un barrido</div>' +
+      barras(noEmp.map(function(o){ return { n:o.n, v:o.bar.no, d:"de " + o.bar.tot + " veces revisado" }; }), "no") + '</div>';
+  }
+  return s + '</section>';
+}
+
+
+
+/* ---- vista curso (proyector) ---- */
+function vistaCurso(c){
+  var esta = regsSemana(c.id, 0);
+  var total = esta.filter(function(r){ var a = ACC_BY_ID[r.accionId]; return a && a.f === "par" && a.s > 0; }).length;
+  var meta = Math.max(1, +DB.config.meta || 250);
+  var pct = Math.min(100, Math.round(total / meta * 100));
+  var cand = candidatos(c);
+  var principalId = premioGuardado(c, "principal");
+  var principal = principalId ? alumno(c, principalId) : null;
+
+  var s = '<div class="proj"><div class="gut">';
+  s += '<div class="proj-head"><h1>' + h(c.nombre) + (c.asignatura ? ' · ' + h(c.asignatura) : "") + '</h1><span>' + h(rangoSemana(new Date())) + '</span></div>';
+
+  s += '<section class="meta-card" aria-label="Meta del curso"><div class="meta-num"><div class="eyebrow">Meta del curso</div>' +
+    '<div><b>' + total + '</b><span>de ' + meta + '</span></div></div>' +
+    '<div class="meta-bar"><div class="bar"><i style="width:' + pct + '%"></i></div>' +
+    '<p>' + (total >= meta ? "¡Llegamos a la meta de la semana!" : "Nos faltan <b>" + (meta - total) + "</b> participaciones para llegar a la meta de la semana.") + '</p></div></section>';
+
+  s += '<div class="proj-cols">';
+  s += '<section class="star-card" aria-label="' + h(etiqueta("principal", DB.config.etiquetaPrincipal)) + '">' +
+    '<div style="display:flex;align-items:center;gap:10px">' + estrellaSVG(24, "var(--fdt-dot)") +
+    '<span class="eyebrow">' + h(etiqueta("principal", DB.config.etiquetaPrincipal)) + '</span></div>';
+  if(principal){
+    s += '<b>' + h(corto(principal.nombre)) + '</b>';
+    var nota = (DB.semanas[c.id + "|" + semanaKey(new Date())] || {}).principalNota;
+    s += '<p>' + h(nota || "Lo elegiste tú esta semana.") + '</p>';
+  } else {
+    s += '<b style="color:var(--fg-2)">Por elegir</b><p>Lo decides tú. La app sugiere candidatos según los registros de la semana.</p>';
+  }
+  if(DB.config.reconocimientos) s += '<button type="button" class="btn sm ghost" data-act="modal" data-m="premios" style="align-self:flex-start">Elegir reconocimientos</button>';
+  s += '</section>';
+
+  if(DB.config.reconocimientos){
+    var toks = { mejora:"par", primera:"pares", crecimiento:"fdt", explica:"doc" };
+    s += '<div class="premios">';
+    PREMIOS.forEach(function(p){
+      var id = premioGuardado(c, p.id);
+      var al = id ? alumno(c, id) : null;
+      var sug = cand[p.id] && cand[p.id].length ? alumno(c, cand[p.id][0]) : null;
+      var tok = toks[p.id];
+      s += '<div class="premio" style="background:var(--' + tok + '-wash);color:var(--' + tok + '-ink)">' +
+        '<span>' + estrellaSVG(17, "var(--" + tok + "-dot)") + h(etiqueta(p.id, p.def)) + '</span>' +
+        '<b style="color:var(--fg)">' + (al ? h(corto(al.nombre)) : '<span style="color:var(--fg-3);font-size:.62em">' + (sug ? "Sugerido: " + h(corto(sug.nombre)) : "Desierto esta semana") + '</span>') + '</b></div>';
+    });
+    s += '</div>';
+  }
+  s += '</div>';
+
+  s += '<div class="proj-foot"><span>Los reconocimientos cambian cada semana.</span>' +
+    '<button type="button" class="btn sm ghost" data-act="ir" data-v="clase">Volver</button></div>';
+  s += '</div></div>';
+  return s;
+}
+
+/* ---- vista configuración ---- */
+function vistaConfig(c){
+  var s = "";
+  s += '<header class="topbar"><div class="gut"><div class="toprow">' +
+    (c ? '<button type="button" class="icon-btn" data-act="ir" data-v="clase" aria-label="Volver">' +
+      '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 2L4 8l6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' : '') +
+    '<div style="flex:1;min-width:0"><b style="font-family:var(--display);font-size:19px;font-weight:800">Ajustes</b>' +
+    '<div style="font-size:12px;color:var(--on-navy-2)">Cursos, reconocimientos y respaldo</div></div>' +
+    '</div></div></header>';
+
+  s += '<div class="page"><div class="gut">';
+
+  if(!DB.cursos.length){
+    s += '<section class="card"><div class="empty"><h2>Todavía no tienes cursos</h2>' +
+      '<p>Crea un curso y pega la nómina copiada desde Excel o desde LIRMI, un estudiante por línea. Los datos quedan solo en este dispositivo.</p>' +
+      '<button type="button" class="btn accent" data-act="modal" data-m="nuevo-curso">Crear mi primer curso</button>' +
+      '<div style="margin-top:12px"><button type="button" class="link" data-act="ejemplo">Cargar un curso de ejemplo para probar</button></div>' +
+      '</div></section>';
+  } else {
+    s += '<section class="card"><h3>Mis cursos</h3><div class="sub">Toca uno para trabajar con él</div>';
+    DB.cursos.forEach(function(x){
+      s += '<div class="list-item"><button type="button" class="grow" style="background:none;border:0;text-align:left;padding:0;color:inherit" data-act="set-curso" data-id="' + x.id + '">' +
+        '<b style="font-size:14.5px">' + h(x.nombre) + (x.id === DB.cursoActivo ? ' <span style="color:var(--orange-ink);font-size:11.5px">· activo</span>' : '') + '</b>' +
+        '<small>' + (x.asignatura ? h(x.asignatura) + " · " : "") + alumnosDe(x).length + ' estudiantes</small></button>' +
+        '<button type="button" class="link" data-act="modal" data-m="editar-curso" data-id="' + x.id + '">Editar</button></div>';
+    });
+    s += '<div class="btn-row" style="margin-top:12px"><button type="button" class="btn sm accent" data-act="modal" data-m="nuevo-curso">Agregar curso</button></div></section>';
+  }
+
+  if(c && alumnosDe(c).length){
+    s += '<section class="card"><h3>Consolidado</h3>' +
+      '<div class="sub">Quién participa, quién no aparece, quién no inicia la tarea, por semana o por mes</div>' +
+      '<button type="button" class="btn accent wide" data-act="ir" data-v="consolidado">Ver el consolidado de ' + h(c.nombre) + '</button></section>';
+
+    var salaC = salaDe(c);
+    var ubic = salaC ? Object.keys(salaC.asientos || {}).length : 0;
+    s += '<section class="card"><h3>Mapa de la sala</h3>' +
+      '<div class="sub">' + (salaC ? ubic + ' de ' + alumnosDe(c).length + ' estudiantes ubicados en ' + salaC.filas + ' filas por ' + salaC.cols + ' columnas'
+        : 'Arma la distribución de puestos para registrar tocando la posición y ver dónde cae la participación') + '</div>' +
+      '<button type="button" class="btn ' + (salaC ? "ghost" : "accent") + ' wide" data-act="ir" data-v="sala">' + (salaC ? "Editar el mapa" : "Armar el mapa") + '</button></section>';
+  }
+
+  s += '<section class="card"><h3>Pantalla de inicio</h3><div class="sub">La portada con el logo de Savia Educa</div>' +
+    toggle("mostrarInicio", "Mostrarla al abrir la app", "Un toque más antes de entrar a la clase.", DB.config.mostrarInicio !== false) +
+    '<button type="button" class="link" data-act="ir" data-v="inicio" style="margin-top:4px">Ver la pantalla de inicio</button></section>';
+
+  s += '<section class="card"><h3>Vista para el curso</h3><div class="sub">Lo que proyectas a los estudiantes</div>' +
+    toggle("vistaCurso", "Mostrar la vista de curso", "La barra de meta colectiva y los reconocimientos. Nunca muestra conteos por estudiante ni ranking.", DB.config.vistaCurso) +
+    toggle("reconocimientos", "Reconocimientos semanales", "Mayor mejora, primera participación y el resto. La app sugiere, tú decides.", DB.config.reconocimientos) +
+    '<div class="field" style="margin-top:12px"><label for="meta">Meta semanal de participaciones del curso</label>' +
+    '<input type="number" id="meta" min="1" step="10" value="' + (+DB.config.meta||250) + '" data-cfg="meta"></div>';
+  if(DB.config.reconocimientos){
+    s += '<div style="margin-top:14px"><div class="eyebrow" style="color:var(--fg-2);margin-bottom:8px">Nombres de los reconocimientos</div>' +
+      '<div style="display:flex;flex-direction:column;gap:9px">' +
+      '<div class="field"><label for="et-principal">Reconocimiento principal</label><input type="text" id="et-principal" data-et="principal" value="' + h(etiqueta("principal", DB.config.etiquetaPrincipal)) + '"></div>';
+    PREMIOS.forEach(function(p){
+      s += '<div class="field"><label for="et-' + p.id + '">' + h(p.def) + '</label><input type="text" id="et-' + p.id + '" data-et="' + p.id + '" value="' + h(etiqueta(p.id, p.def)) + '"></div>';
+    });
+    s += '</div></div>';
+  }
+  s += '</section>';
+
+  s += '<section class="card" id="respaldo"><h3>Respaldo</h3>' +
+    '<div class="sub">Todo vive en este navegador. Si lo borras o cambias de teléfono, se pierde.' +
+    (APP_PROPIA ? ' Descarga el archivo y guárdalo donde quieras.' : ' Copia este texto y guárdalo donde quieras.') + '</div>' +
+    '<textarea id="out-bak" readonly aria-label="Respaldo">' + h(JSON.stringify(DB)) + '</textarea>' +
+    '<div class="btn-row" style="margin-top:9px">' +
+    (APP_PROPIA
+      ? '<button type="button" class="btn sm accent" data-act="bajar-bak">Descargar respaldo</button>' +
+        '<button type="button" class="btn sm ghost" data-act="compartir-bak">Compartir</button>'
+      : '<button type="button" class="btn sm accent" data-act="copiar-bak">Copiar respaldo</button>') +
+    '<button type="button" class="btn sm ghost" data-act="modal" data-m="restaurar">Restaurar</button></div>' +
+    (DB.config.ultimoRespaldo ? '<div style="margin-top:9px;font-size:11.5px;color:var(--fg-2)">Último respaldo copiado: ' + fechaLarga(hoyISO(new Date(DB.config.ultimoRespaldo))) + '</div>' : '') +
+    '</section>';
+
+  s += '<section class="card"><h3>Exportar a Excel</h3>' +
+    '<div class="sub">' + DB.registros.length + ' registros. Copia y pega en una hoja de cálculo: viene separado por punto y coma.</div>' +
+    '<textarea id="out-csv" readonly aria-label="Datos en CSV">' + h(csv()) + '</textarea>' +
+    '<div class="btn-row" style="margin-top:9px">' +
+    (APP_PROPIA
+      ? '<button type="button" class="btn sm accent" data-act="bajar-csv">Descargar Excel</button>' +
+        '<button type="button" class="btn sm ghost" data-act="copiar-csv">Copiar</button>'
+      : '<button type="button" class="btn sm accent" data-act="copiar-csv">Copiar datos</button>') +
+    '</div></section>';
+
+  s += '<section class="card"><h3>Sobre Turnos</h3>' +
+    '<div class="sub">Qué es, en qué se basa y qué límites declara</div>' +
+    '<button type="button" class="btn ghost wide" data-act="ir" data-v="quienes">Quiénes somos</button></section>';
+
+  s += '<section class="card"><h3>Qué significa cada color</h3><div class="sub">Las cuatro familias de interacción</div>';
+  FAMILIAS.forEach(function(f){
+    s += '<div class="row"><i style="background:var(--' + f.id + '-dot)"></i><b>' + h(f.t) + '</b><small>' + h(f.pie) + '</small></div>';
+  });
+  s += '</section>';
+
+  s += '</div></div>';
+  return s;
+}
+function toggle(key, titulo, sub, on){
+  return '<div class="toggle-row"><div><b>' + h(titulo) + '</b><small>' + h(sub) + '</small></div>' +
+    '<button type="button" class="sw2" role="switch" aria-checked="' + (on?"true":"false") + '" aria-label="' + h(titulo) + '" data-act="toggle" data-k="' + key + '"><i></i></button></div>';
+}
+
+/* ---- modales ---- */
+function modalHTML(c){
+  var s = '<div class="modal-bg" data-act="cerrar-modal"><div class="modal" role="dialog" aria-label="' + h(modal.titulo || "Opciones") + '" data-stop="1"><div class="gut">';
+  s += '<h3>' + h(modal.titulo) + '</h3>';
+  if(modal.sub) s += '<div style="font-size:12.5px;color:var(--fg-2);margin-top:-4px">' + h(modal.sub) + '</div>';
+
+  if(modal.m === "fase"){
+    var cl = asegurarClase();
+    FASES.forEach(function(f, i){
+      s += '<button type="button" class="opt" aria-current="' + (f.id === cl.fase ? "true":"false") + '" data-act="set-fase" data-id="' + f.id + '"><span class="n">' + (i+1) + '</span>' + h(f.t) + '</button>';
+    });
+  }
+  else if(modal.m === "curso"){
+    DB.cursos.forEach(function(x){
+      s += '<button type="button" class="opt" aria-current="' + (x.id === DB.cursoActivo ? "true":"false") + '" data-act="set-curso" data-id="' + x.id + '">' +
+        '<span style="flex:1;min-width:0">' + h(x.nombre) + '<small style="display:block;font-weight:400;font-size:11.5px;color:var(--fg-2)">' + alumnosDe(x).length + ' estudiantes</small></span></button>';
+    });
+    s += '<button type="button" class="btn ghost wide" data-act="modal" data-m="nuevo-curso">Agregar curso</button>';
+  }
+  else if(modal.m === "nuevo-curso" || modal.m === "editar-curso"){
+    var ed = modal.m === "editar-curso" ? DB.cursos.filter(function(x){ return x.id === modal.id; })[0] : null;
+    var lista = modal.nomina || [];
+    s += '<div class="field"><label for="f-nombre">Nombre del curso</label><input type="text" id="f-nombre" placeholder="6°A" value="' + h(ed?ed.nombre:"") + '"></div>';
+    s += '<div class="field"><label for="f-asig">Asignatura</label><input type="text" id="f-asig" placeholder="Matemática" value="' + h(ed?ed.asignatura:"") + '"></div>';
+
+    s += '<div class="field"><label>Nómina · ' + lista.length + (lista.length === 1 ? ' estudiante' : ' estudiantes') + '</label>';
+    s += '<div class="btn-row">' +
+      '<label class="btn sm ghost file-label" for="f-csv">Subir archivo CSV<input type="file" id="f-csv" accept=".csv,.txt,text/csv,text/plain"></label>' +
+      '<button type="button" class="btn sm ghost" data-act="nomina-pegar">' + (modal.pegar ? "Ocultar pegado" : "Pegar una lista") + '</button>' +
+      '</div>';
+    if(modal.pegar){
+      s += '<textarea id="f-pegar" placeholder="Un estudiante por línea" style="margin-top:8px"></textarea>' +
+        '<button type="button" class="btn sm" data-act="nomina-pegar-ok" style="margin-top:7px;align-self:flex-start">Agregar los de la lista</button>';
+    }
+    s += '<div style="display:flex;gap:7px;margin-top:9px"><input type="text" id="f-add" placeholder="Nombre del estudiante">' +
+      '<button type="button" class="btn sm accent" data-act="nomina-add" style="flex:none">Agregar</button></div>';
+    s += '<div class="nomina">';
+    if(!lista.length) s += '<p class="nomina-vacia">Todavía no hay estudiantes. Sube un CSV o agrégalos de a uno.</p>';
+    lista.forEach(function(a, i){
+      s += '<div class="nom-row"><span class="n">' + (i+1) + '</span>' +
+        '<input type="text" data-nom="' + i + '" value="' + h(a.nombre) + '" aria-label="Estudiante ' + (i+1) + '">' +
+        '<button type="button" class="nom-del" data-act="nomina-del" data-i="' + i + '" aria-label="Quitar a ' + h(a.nombre) + '">' +
+        '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button></div>';
+    });
+    s += '</div></div>';
+
+    s += '<div class="btn-row"><button type="button" class="btn accent" data-act="' + (ed ? "guardar-curso" : "crear-curso") + '" data-id="' + (ed?ed.id:"") + '">Guardar</button>' +
+      '<button type="button" class="btn ghost" data-act="cerrar-modal">Cancelar</button></div>';
+    if(ed) s += '<button type="button" class="link danger" data-act="borrar-curso" data-id="' + ed.id + '" style="align-self:flex-start">Eliminar este curso y todos sus registros</button>';
+  }
+  else if(modal.m === "premios"){
+    var cand = candidatos(c);
+    var grupos = [{id:"principal", def:DB.config.etiquetaPrincipal}].concat(PREMIOS);
+    grupos.forEach(function(p){
+      var elegido = premioGuardado(c, p.id);
+      s += '<div style="margin-top:4px"><div class="eyebrow" style="color:var(--fg-2);margin-bottom:7px">' + h(etiqueta(p.id, p.def)) + '</div>';
+      var lista = cand[p.id] || [];
+      if(!lista.length) s += '<div style="font-size:12.5px;color:var(--fg-2);margin-bottom:7px">Sin candidatos esta semana según los registros.</div>';
+      s += '<div style="display:flex;flex-wrap:wrap;gap:7px">';
+      lista.forEach(function(aid){
+        var al = alumno(c, aid); if(!al) return;
+        s += '<button type="button" class="prio-chip" style="border-color:' + (elegido === aid ? "var(--orange)" : "var(--line)") + '" data-act="premio" data-k="' + p.id + '" data-id="' + aid + '">' + h(corto(al.nombre)) + '</button>';
+      });
+      alumnosDe(c).filter(function(al){ return elegido === al.id && lista.indexOf(al.id) === -1; }).forEach(function(al){
+        s += '<button type="button" class="prio-chip" style="border-color:var(--orange)" data-act="premio" data-k="' + p.id + '" data-id="' + al.id + '">' + h(corto(al.nombre)) + '</button>';
+      });
+      if(elegido) s += '<button type="button" class="prio-chip" style="border-color:var(--line);color:var(--fg-2)" data-act="premio" data-k="' + p.id + '" data-id="">Quitar</button>';
+      s += '</div></div>';
+    });
+    s += '<div style="font-size:11.5px;color:var(--fg-2);margin-top:6px">La app sugiere según los registros de la semana. La decisión es tuya: puedes dejar uno desierto.</div>';
+    s += '<button type="button" class="btn wide" data-act="cerrar-modal">Listo</button>';
+  }
+  else if(modal.m === "puesto"){
+    var pk = modal.k.split("-");
+    var sala2 = salaDe(c) || { asientos:{} };
+    var actual = (sala2.asientos || {})[modal.k];
+    s += '<div style="font-size:12.5px;color:var(--fg-2);margin-top:-4px">Fila ' + (+pk[0]+1) + ', columna ' + (+pk[1]+1) + ', contando desde la pizarra</div>';
+    if(actual) s += '<button type="button" class="btn ghost wide" data-act="sala-set" data-k="' + modal.k + '" data-id="">Dejar el puesto vacío</button>';
+    s += '<div style="display:flex;flex-direction:column;gap:7px;max-height:46vh;overflow-y:auto">';
+    alumnosDe(c).forEach(function(a){
+      var suyo = asientoDe(c, a.id);
+      s += '<button type="button" class="opt" aria-current="' + (actual === a.id ? "true":"false") + '" data-act="sala-set" data-k="' + modal.k + '" data-id="' + a.id + '">' +
+        '<span style="flex:1;min-width:0">' + h(a.nombre) +
+        (suyo && suyo !== modal.k ? '<small style="display:block;font-weight:400;font-size:11.5px;color:var(--fg-2)">hoy está en ' + (+suyo.split("-")[0]+1) + '·' + (+suyo.split("-")[1]+1) + ', se mueve acá</small>' : '') +
+        '</span></button>';
+    });
+    s += '</div><button type="button" class="btn ghost wide" data-act="cerrar-modal">Cancelar</button>';
+  }
+  else if(modal.m === "restaurar"){
+    if(APP_PROPIA) s += '<label class="btn ghost wide file-label" for="f-bak">Elegir el archivo de respaldo' +
+      '<input type="file" id="f-bak" accept=".json,application/json"></label>';
+    s += '<div class="field"><label for="f-restore">' + (APP_PROPIA ? 'O pega aquí el texto del respaldo' : 'Pega aquí el texto del respaldo') + '</label><textarea id="f-restore" placeholder="{...}"></textarea></div>';
+    s += '<div style="font-size:12px;color:var(--danger)">Esto reemplaza todo lo que tienes guardado en este dispositivo.</div>';
+    s += '<div class="btn-row"><button type="button" class="btn accent" data-act="restaurar">Reemplazar mis datos</button>' +
+      '<button type="button" class="btn ghost" data-act="cerrar-modal">Cancelar</button></div>';
+  }
+  else if(modal.m === "confirmar"){
+    s += '<div style="font-size:13.5px;color:var(--fg-2)">' + h(modal.texto) + '</div>';
+    s += '<div class="btn-row"><button type="button" class="btn accent" data-act="' + modal.accion + '" data-id="' + h(modal.id||"") + '" data-ok="1">' + h(modal.ok) + '</button>' +
+      '<button type="button" class="btn ghost" data-act="cerrar-modal">Cancelar</button></div>';
+  }
+  s += '</div></div></div>';
+  return s;
+}
+
+/* ========== eventos ========== */
+function val(id){ var el = document.getElementById(id); return el ? el.value : ""; }
+function limpiaNombre(n){
+  return String(n||"").replace(/\s+/g," ").replace(/^\s*\d+\s*[\.\)\-]\s*/,"").replace(/^,+|,+$/g,"").trim();
+}
+function esNombre(n){
+  if(!n || n.length < 3) return false;
+  if(/^[\d.\-kK\s]+$/.test(n)) return false;
+  if(/^(n|n°|nro|num|numero|número|rut|run|curso|nombre|nombres|apellido|apellidos|alumno|alumnos|estudiante|estudiantes|lista|total)\b/i.test(n)) return false;
+  return /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{2}/.test(n);
+}
+function celdasCSV(linea, delim){
+  var out = [], cur = "", q = false;
+  for(var i = 0; i < linea.length; i++){
+    var ch = linea.charAt(i);
+    if(ch === '"'){ if(q && linea.charAt(i+1) === '"'){ cur += '"'; i++; } else q = !q; }
+    else if(ch === delim && !q){ out.push(cur); cur = ""; }
+    else cur += ch;
+  }
+  out.push(cur);
+  return out.map(function(x){ return x.replace(/\s+/g," ").trim(); });
+}
+function mejorColumna(filas, ncol){
+  var mejor = 0, score = -1;
+  for(var i = 0; i < ncol; i++){
+    var s = 0;
+    filas.forEach(function(f){
+      var v = (f[i] || "").trim();
+      if(!v || /^[\d.\-kK\s]+$/.test(v)) return;
+      if(!/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{3}/.test(v)) return;
+      s += Math.min(3, v.split(" ").length);
+    });
+    if(s > score){ score = s; mejor = i; }
+  }
+  return mejor;
+}
+function parseCSVNombres(txt){
+  var lineas = String(txt||"").replace(/^﻿/,"").split(/\r?\n/).filter(function(l){ return l.trim(); });
+  if(!lineas.length) return [];
+  var delim = ";", mejorN = 0;
+  [";", ",", "\t", "|"].forEach(function(d){
+    var n = celdasCSV(lineas[0], d).length;
+    if(n > mejorN){ mejorN = n; delim = d; }
+  });
+  var filas = lineas.map(function(l){ return celdasCSV(l, delim); });
+  var ncol = filas.reduce(function(m,f){ return Math.max(m, f.length); }, 1);
+  if(ncol === 1) return filas.map(function(f){ return limpiaNombre(f[0]); }).filter(esNombre);
+
+  var cab = filas[0].map(function(x){ return x.toLowerCase(); });
+  var tieneCab = cab.some(function(x){ return /nombre|apellido|alumno|estudiante|rut|run/.test(x); });
+  var cuerpo = tieneCab ? filas.slice(1) : filas;
+  if(!cuerpo.length) return [];
+  var aps = [], idxNo = -1, idxUno = -1;
+  if(tieneCab){
+    cab.forEach(function(x, i){
+      if(/apellido/.test(x)) aps.push(i);
+      if(/nombre/.test(x) && !/completo/.test(x) && idxNo === -1) idxNo = i;
+      if(/(nombre completo|alumno|estudiante)/.test(x) && idxUno === -1) idxUno = i;
+    });
+  }
+  if(aps.length && idxNo > -1 && aps.indexOf(idxNo) === -1){
+    return cuerpo.map(function(f){
+      var ap = aps.map(function(i){ return (f[i]||"").trim(); }).filter(Boolean).join(" ");
+      var no = (f[idxNo] || "").trim();
+      return limpiaNombre(ap && no ? ap + ", " + no : (ap || no));
+    }).filter(esNombre);
+  }
+  var col = idxUno > -1 ? idxUno : (idxNo > -1 ? idxNo : mejorColumna(cuerpo, ncol));
+  return cuerpo.map(function(f){ return limpiaNombre(f[col] || ""); }).filter(esNombre);
+}
+function parseNomina(txt){
+  var vistos = {};
+  return String(txt||"").split(/\r?\n/).map(function(l){ return limpiaNombre(l.replace(/\t/g," ")); })
+    .filter(function(l){
+      if(!esNombre(l)) return false;
+      var k = l.toLowerCase();
+      if(vistos[k]) return false;
+      vistos[k] = true; return true;
+    });
+}
+function sincronizarNomina(){
+  if(!modal || !modal.nomina) return;
+  Array.prototype.forEach.call(document.querySelectorAll("[data-nom]"), function(el){
+    var i = +el.getAttribute("data-nom");
+    if(modal.nomina[i]) modal.nomina[i].nombre = el.value;
+  });
+}
+function agregarNombres(nombres){
+  if(!modal || !modal.nomina) return 0;
+  sincronizarNomina();
+  var vistos = {};
+  modal.nomina.forEach(function(a){ vistos[String(a.nombre).trim().toLowerCase()] = true; });
+  var n = 0;
+  nombres.forEach(function(x){
+    var k = x.trim().toLowerCase();
+    if(!k || vistos[k]) return;
+    vistos[k] = true; modal.nomina.push({ id:uid(), nombre:x }); n++;
+  });
+  return n;
+}
+function aplicarCSV(txt){
+  var nombres = parseCSVNombres(txt);
+  if(!nombres.length){
+    toast("No encontré nombres en ese archivo. Revisa que tenga una columna con los nombres.", null); render(); return;
+  }
+  var n = agregarNombres(nombres);
+  toast(n ? "Se agregaron " + n + " estudiantes. Revísalos antes de guardar." : "Esos nombres ya estaban en la lista.", null);
+  render();
+}
+function leerCSV(file){
+  var fr = new FileReader();
+  fr.onerror = function(){ toast("No se pudo leer el archivo.", null); render(); };
+  fr.onload = function(){
+    var txt = String(fr.result || "");
+    if(txt.indexOf(String.fromCharCode(65533)) > -1){
+      var fr2 = new FileReader();
+      fr2.onload = function(){ aplicarCSV(String(fr2.result || "")); };
+      fr2.onerror = function(){ aplicarCSV(txt); };
+      try{ fr2.readAsText(file, "windows-1252"); return; }catch(e){}
+    }
+    aplicarCSV(txt);
+  };
+  try{ fr.readAsText(file, "UTF-8"); }catch(e){ toast("No se pudo leer el archivo.", null); render(); }
+}
+function aplicarNomina(c, lista){
+  var vistos = {};
+  c.estudiantes = lista.map(function(a){ return { id:a.id || uid(), nombre:limpiaNombre(a.nombre) }; })
+    .filter(function(a){
+      if(!a.nombre) return false;
+      var k = a.nombre.toLowerCase();
+      if(vistos[k]) return false;
+      vistos[k] = true; return true;
+    });
+}
+
+document.addEventListener("click", function(ev){
+  var t = ev.target.closest("[data-act]");
+  if(!t){
+    if(ev.target.closest(".modal")) return;
+    return;
+  }
+  var act = t.getAttribute("data-act");
+  var id = t.getAttribute("data-id");
+  var c = curso();
+
+  if(act === "ir"){
+    guardarNotasVisibles();
+    vista = t.getAttribute("data-v"); sheetAlumno = null; modal = null; cerrarToast(); render();
+    var sec = t.getAttribute("data-sec");
+    if(sec){ var el = document.getElementById(sec); if(el) el.scrollIntoView({ block:"start" }); }
+    else window.scrollTo(0,0);
+    return;
+  }
+  if(act === "abrir"){ sheetAlumno = id; cerrarToast(); render(); return; }
+  if(act === "cerrar-hoja"){ sheetAlumno = null; render(); return; }
+  if(act === "reg"){ registrar(id, t.getAttribute("data-a")); return; }
+  if(act === "deshacer"){ deshacer(id); return; }
+  if(act === "cerrar-aviso"){ avisoRespaldo = false; render(); return; }
+  if(act === "periodo"){ periodo = t.getAttribute("data-p"); render(); window.scrollTo(0,0); return; }
+  if(act === "modo-lista"){ DB.config.vistaSala = false; guardar(); render(); return; }
+  if(act === "modo-sala"){ DB.config.vistaSala = true; guardar(); render(); return; }
+  if(act === "sala-mas" || act === "sala-menos"){
+    c.sala = c.sala || { filas:5, cols:6, asientos:{} };
+    var campo = t.getAttribute("data-k");
+    var d = act === "sala-mas" ? 1 : -1;
+    c.sala[campo] = Math.max(1, Math.min(12, c.sala[campo] + d));
+    Object.keys(c.sala.asientos).forEach(function(k){
+      var p = k.split("-");
+      if(+p[0] >= c.sala.filas || +p[1] >= c.sala.cols) delete c.sala.asientos[k];
+    });
+    guardar(); render(); return;
+  }
+  if(act === "sala-llenar"){
+    c.sala = c.sala || { filas:5, cols:6, asientos:{} };
+    c.sala.asientos = {};
+    var lista = alumnosDe(c), i = 0;
+    for(var fi = 0; fi < c.sala.filas && i < lista.length; fi++){
+      for(var ci = 0; ci < c.sala.cols && i < lista.length; ci++){ c.sala.asientos[fi + "-" + ci] = lista[i++].id; }
+    }
+    guardar(); render();
+    if(i < lista.length) toast("La sala es chica para el curso: " + (lista.length - i) + " quedaron sin puesto.", null), render();
+    return;
+  }
+  if(act === "sala-vaciar"){
+    if(!t.getAttribute("data-ok")){
+      modal = { m:"confirmar", titulo:"Vaciar el mapa", texto:"Se borran todas las asignaciones de puesto. Los registros ya guardados no se tocan.", ok:"Vaciar", accion:"sala-vaciar" };
+      render(); return;
+    }
+    if(c.sala) c.sala.asientos = {};
+    guardar(); modal = null; render(); return;
+  }
+  if(act === "sala-puesto"){ modal = { m:"puesto", k:t.getAttribute("data-k"), titulo:"Asignar puesto" }; render(); return; }
+  if(act === "sala-set"){
+    var kk = t.getAttribute("data-k");
+    c.sala = c.sala || { filas:5, cols:6, asientos:{} };
+    if(id){
+      Object.keys(c.sala.asientos).forEach(function(x){ if(c.sala.asientos[x] === id) delete c.sala.asientos[x]; });
+      c.sala.asientos[kk] = id;
+    } else delete c.sala.asientos[kk];
+    guardar(); modal = null; render(); return;
+  }
+  if(act === "barrido-ini"){ barrido = { marcas:{}, pincel:"ok" }; cerrarToast(); render(); window.scrollTo(0,0); return; }
+  if(act === "pincel"){ barrido.pincel = id; render(); return; }
+  if(act === "barrido-marca"){
+    if(barrido.marcas[id] === barrido.pincel) delete barrido.marcas[id];
+    else barrido.marcas[id] = barrido.pincel;
+    render(); return;
+  }
+  if(act === "barrido-cancel"){
+    if(Object.keys(barrido.marcas).length && !t.getAttribute("data-ok")){
+      modal = { m:"confirmar", titulo:"Descartar el barrido", texto:"Marcaste " + Object.keys(barrido.marcas).length + " estudiantes. Si sales ahora se pierde.", ok:"Descartar", accion:"barrido-cancel" };
+      render(); return;
+    }
+    barrido = null; modal = null; render(); window.scrollTo(0,0); return;
+  }
+  if(act === "barrido-ok"){
+    var clB = asegurarClase();
+    DB.barridos.push({ id:uid(), cursoId:c.id, claseId:clB.id, fase:clB.fase, ts:Date.now(), marcas:barrido.marcas });
+    var nM = Object.keys(barrido.marcas).length;
+    guardar(); barrido = null; render(); window.scrollTo(0,0);
+    toast("Barrido guardado: " + nM + (nM === 1 ? " estudiante revisado" : " estudiantes revisados") + ".", null); render();
+    return;
+  }
+  if(act === "saltar-inicio"){
+    DB.config.mostrarInicio = false; guardar();
+    vista = DB.cursos.length ? "clase" : "config"; render(); window.scrollTo(0,0);
+    toast("Listo. Puedes volver a activarla en Ajustes.", null); render(); return;
+  }
+  if(act === "modal"){
+    modal = { m:t.getAttribute("data-m"), id:id };
+    modal.titulo = { fase:"Fase de la clase", curso:"Cambiar de curso", "nuevo-curso":"Nuevo curso",
+      "editar-curso":"Editar curso", premios:"Reconocimientos de la semana", restaurar:"Restaurar un respaldo" }[modal.m] || "";
+    if(modal.m === "fase") modal.sub = "La fase queda guardada en cada registro.";
+    if(modal.m === "nuevo-curso") modal.nomina = [];
+    if(modal.m === "editar-curso"){
+      var cx = DB.cursos.filter(function(x){ return x.id === id; })[0];
+      modal.nomina = cx ? alumnosDe(cx).map(function(a){ return { id:a.id, nombre:a.nombre }; }) : [];
+    }
+    render(); return;
+  }
+  if(act === "cerrar-modal"){
+    if(t.classList.contains("modal-bg") && ev.target.closest("[data-stop]")) return;
+    modal = null; render(); return;
+  }
+  if(act === "nomina-add"){
+    var el = document.getElementById("f-add");
+    var nom = limpiaNombre(el ? el.value : "");
+    if(!nom){ if(el) el.focus(); return; }
+    agregarNombres([nom]);
+    focoPendiente = "f-add"; render(); return;
+  }
+  if(act === "nomina-del"){
+    sincronizarNomina();
+    modal.nomina.splice(+t.getAttribute("data-i"), 1);
+    render(); return;
+  }
+  if(act === "nomina-pegar"){ sincronizarNomina(); modal.pegar = !modal.pegar; focoPendiente = modal.pegar ? "f-pegar" : null; render(); return; }
+  if(act === "nomina-pegar-ok"){
+    var n = agregarNombres(parseNomina(val("f-pegar")));
+    modal.pegar = false;
+    toast(n ? "Se agregaron " + n + " estudiantes." : "No encontré nombres nuevos en ese texto.", null);
+    render(); return;
+  }
+  if(act === "fase-next"){
+    var cl = asegurarClase();
+    var i = FASES.map(function(f){ return f.id; }).indexOf(cl.fase);
+    cl.fase = FASES[Math.min(FASES.length-1, i+1)].id; guardar(); render(); return;
+  }
+  if(act === "set-fase"){ var cl2 = asegurarClase(); cl2.fase = id; guardar(); modal = null; render(); return; }
+  if(act === "grupal"){ var cl3 = asegurarClase(); cl3.grupal = !cl3.grupal; guardar(); render(); return; }
+  if(act === "set-curso"){ DB.cursoActivo = id; guardar(); modal = null; vista = "clase"; render(); window.scrollTo(0,0); return; }
+  if(act === "toggle"){ var k = t.getAttribute("data-k"); DB.config[k] = !DB.config[k]; guardar(); render(); return; }
+
+  if(act === "crear-curso"){
+    var nomC = val("f-nombre").trim();
+    if(!nomC){ toast("Ponle un nombre al curso.", null); render(); return; }
+    sincronizarNomina();
+    var nuevo = { id:uid(), nombre:nomC, asignatura:val("f-asig").trim(), estudiantes:[] };
+    aplicarNomina(nuevo, modal.nomina || []);
+    DB.cursos.push(nuevo); DB.cursoActivo = nuevo.id; guardar();
+    modal = null; vista = nuevo.estudiantes.length ? "clase" : "config"; render(); window.scrollTo(0,0);
+    if(!nuevo.estudiantes.length) toast("Curso creado, pero sin estudiantes. Agrégalos desde Editar.", null);
+    return;
+  }
+  if(act === "guardar-curso"){
+    var cc = DB.cursos.filter(function(x){ return x.id === id; })[0]; if(!cc) return;
+    sincronizarNomina();
+    cc.nombre = val("f-nombre").trim() || cc.nombre;
+    cc.asignatura = val("f-asig").trim();
+    aplicarNomina(cc, modal.nomina || []);
+    guardar(); modal = null; render(); return;
+  }
+  if(act === "borrar-curso"){
+    if(!t.getAttribute("data-ok")){
+      modal = { m:"confirmar", titulo:"Eliminar el curso", texto:"Se borran el curso, su nómina y todos sus registros de este dispositivo. No se puede deshacer.", ok:"Eliminar", accion:"borrar-curso", id:id };
+      render(); return;
+    }
+    DB.registros = DB.registros.filter(function(r){ return r.cursoId !== id; });
+    DB.clases = DB.clases.filter(function(x){ return x.cursoId !== id; });
+    DB.cursos = DB.cursos.filter(function(x){ return x.id !== id; });
+    Object.keys(DB.semanas).forEach(function(k){ if(k.indexOf(id + "|") === 0) delete DB.semanas[k]; });
+    if(DB.cursoActivo === id) DB.cursoActivo = DB.cursos.length ? DB.cursos[0].id : null;
+    guardar(); modal = null; vista = "config"; render(); return;
+  }
+  if(act === "cerrar-clase"){
+    guardarNotasVisibles();
+    var cl4 = asegurarClase();
+    var pend = regsDeClase(cl4.id).filter(function(r){ var a = ACC_BY_ID[r.accionId]; return a && a.otro && !String(r.nota||"").trim(); });
+    if(pend.length){ toast("Faltan " + pend.length + " descripciones.", null); render(); return; }
+    cl4.cerrada = true; guardar(); vista = "clase"; render(); window.scrollTo(0,0);
+    toast("Clase cerrada. La próxima parte en blanco.", null); render();
+    return;
+  }
+  if(act === "premio"){ fijarPremio(c, t.getAttribute("data-k"), id || null); return; }
+  if(act === "copiar-csv"){ DB.config.ultimoRespaldo = DB.config.ultimoRespaldo || null; copiar(csv(), "csv"); return; }
+  if(act === "copiar-bak"){ DB.config.ultimoRespaldo = Date.now(); guardar(); copiar(JSON.stringify(DB), "bak"); return; }
+  if(act === "bajar-bak"){ DB.config.ultimoRespaldo = Date.now(); guardar(); descargar(nombreArchivo("json"), JSON.stringify(DB), "application/json"); return; }
+  if(act === "compartir-bak"){ DB.config.ultimoRespaldo = Date.now(); guardar(); compartir(nombreArchivo("json"), JSON.stringify(DB), "application/json"); return; }
+  if(act === "bajar-csv"){ descargar(nombreArchivo("csv"), "\ufeff" + csv(), "text/csv;charset=utf-8"); return; }
+  if(act === "restaurar"){
+    var txt = val("f-restore").trim();
+    try{
+      var d = JSON.parse(txt);
+      if(!d || !d.cursos) throw new Error("formato");
+      DB = normalizar(d); guardar(); modal = null; vista = DB.cursos.length ? "clase" : "config"; render();
+      toast("Datos restaurados.", null); render();
+    }catch(e){ toast("Ese texto no es un respaldo válido.", null); render(); }
+    return;
+  }
+  if(act === "ejemplo"){
+    var nombres = ["Agustín Barraza","Antonia Castro","Benjamín Rojas","Bruno Kast","Catalina Vera","Diego Muñoz","Emilia Salas","Facundo Ortiz","Florencia Lagos","Gabriel Tapia","Ignacio Peña","Isidora Nieto","Joaquín Araya","Josefa Pino","Lucas Guzmán","Magdalena Riquelme","Martín Escobar","Martina Soto","Matías Quiroz","Paz Herrera","Renato Fuentes","Sofía Zúñiga","Tomás Ibáñez","Valentina Díaz"];
+    var ej = { id:uid(), nombre:"6°A (ejemplo)", asignatura:"Matemática", estudiantes:nombres.map(function(n){ return { id:uid(), nombre:n }; }) };
+    DB.cursos.push(ej); DB.cursoActivo = ej.id; guardar(); vista = "clase"; render(); window.scrollTo(0,0);
+    toast("Curso de ejemplo cargado. Bórralo desde Ajustes cuando quieras.", null); render();
+    return;
+  }
+}, false);
+
+document.addEventListener("keydown", function(ev){
+  if(ev.key === "Enter" && ev.target && ev.target.id === "f-add"){
+    ev.preventDefault();
+    var nom = limpiaNombre(ev.target.value);
+    if(!nom) return;
+    agregarNombres([nom]);
+    focoPendiente = "f-add"; render();
+  }
+}, false);
+
+document.addEventListener("change", function(ev){
+  var el = ev.target;
+  if(el.id === "f-csv" && el.files && el.files[0]){ leerCSV(el.files[0]); el.value = ""; return; }
+  if(el.id === "f-bak" && el.files && el.files[0]){
+    var fr = new FileReader();
+    fr.onload = function(){ var t = document.getElementById("f-restore"); if(t) t.value = String(fr.result || ""); toast("Archivo leído. Revisa y confirma abajo.", null); render(); };
+    fr.onerror = function(){ toast("No se pudo leer el archivo.", null); render(); };
+    fr.readAsText(el.files[0], "UTF-8"); el.value = ""; return;
+  }
+  if(el.getAttribute && el.getAttribute("data-nom") !== null) return;
+  if(el.getAttribute && el.getAttribute("data-cfg") === "meta"){ DB.config.meta = Math.max(1, +el.value || 250); guardar(); }
+  if(el.getAttribute && el.getAttribute("data-et")){
+    var k = el.getAttribute("data-et");
+    DB.config.etiquetas[k] = el.value.trim() || null;
+    if(!DB.config.etiquetas[k]) delete DB.config.etiquetas[k];
+    if(k === "principal") DB.config.etiquetaPrincipal = el.value.trim() || "Matemático de la semana";
+    guardar();
+  }
+}, false);
+
+document.addEventListener("input", function(ev){
+  var el = ev.target;
+  var ni = el.getAttribute && el.getAttribute("data-nom");
+  if(ni !== null && ni !== undefined && modal && modal.nomina && modal.nomina[+ni]){
+    modal.nomina[+ni].nombre = el.value; return;
+  }
+  var rid = el.getAttribute && el.getAttribute("data-nota");
+  if(rid){
+    var r = DB.registros.filter(function(x){ return x.id === rid; })[0];
+    if(r){ r.nota = el.value; guardar(); }
+  }
+}, false);
+
+function guardarNotasVisibles(){
+  Array.prototype.forEach.call(document.querySelectorAll("[data-nota]"), function(el){
+    var r = DB.registros.filter(function(x){ return x.id === el.getAttribute("data-nota"); })[0];
+    if(r) r.nota = el.value;
+  });
+  guardar();
+}
+
+/* ========== arranque ========== */
+DB = cargar();
+if(!DB.cursoActivo && DB.cursos.length) DB.cursoActivo = DB.cursos[0].id;
+vista = (DB.config.mostrarInicio === false && DB.cursos.length) ? "clase" : "inicio";
+render();
+
+if(APP_PROPIA && navigator.serviceWorker){
+  window.addEventListener("load", function(){
+    try{ navigator.serviceWorker.register("sw.js").catch(function(){}); }catch(e){}
+  });
+}
+})();
+</script>
