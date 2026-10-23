@@ -99,7 +99,7 @@ button{ cursor:pointer; }
 .topbar .gut{ padding-block:13px 15px; display:flex; flex-direction:column; gap:12px; }
 .toprow{ display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0; }
 .curso-pick{ display:flex; align-items:baseline; gap:8px; min-width:0; background:none; border:0; padding:0; color:var(--on-navy); text-align:left; }
-.curso-pick b{ font-family:var(--display); font-size:21px; font-weight:800; letter-spacing:-0.015em; }
+.curso-pick b{ font-family:var(--display); font-size:21px; font-weight:800; letter-spacing:-0.015em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:52vw; }
 .curso-pick span{ font-size:12.5px; color:var(--on-navy-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .icon-btn{ display:flex; align-items:center; justify-content:center; width:40px; height:40px; flex:none; border:0; border-radius:999px; background:var(--navy-2); color:var(--on-navy); }
 .fase-box{ display:flex; align-items:center; gap:10px; background:var(--navy-2); border-radius:var(--r); padding:8px 8px 8px 13px; }
@@ -120,6 +120,13 @@ button{ cursor:pointer; }
 .prio-head .eyebrow{ color:var(--orange-ink); }
 .prio-head small{ font-size:11px; color:var(--orange-ink); opacity:.85; }
 .prio-list{ display:flex; flex-wrap:wrap; gap:6px; }
+.btn-azar{ display:flex; align-items:center; gap:6px; min-height:34px; padding:0 13px; flex:none; border:0; border-radius:999px; background:var(--orange); color:var(--on-orange); font-size:12.5px; font-weight:700; }
+.btn-hdr{ min-height:32px; padding:0 13px; flex:none; border:1px solid var(--on-navy-3); border-radius:999px; background:transparent; color:var(--on-navy); font-size:12.5px; font-weight:650; }
+.tile.ausente, .seat.ausente{ opacity:.42; border-style:dashed; }
+.sorteo-caja{ display:flex; flex-direction:column; align-items:center; gap:7px; padding:22px 10px 20px; border-radius:16px; background:var(--par-wash); text-align:center; }
+.sorteo-caja b{ font-family:var(--display); font-size:clamp(28px,8.4vw,38px); font-weight:700; line-height:1.1; color:var(--par-ink); }
+.sorteo-caja small{ font-size:12px; color:var(--fg-2); }
+@media (prefers-reduced-motion:no-preference){ .sorteo-caja b{ animation:sale .22s ease-out; } @keyframes sale{ from{ transform:scale(.92); opacity:0 } } }
 .prio-chip{ display:flex; align-items:center; min-height:36px; padding:0 12px; border-radius:999px; background:var(--surface); border:1.5px solid var(--orange); color:var(--fg); font-size:13px; font-weight:600; }
 
 /* ---------- grilla ---------- */
@@ -481,6 +488,8 @@ var avisoRespaldo = true;
 var focoPendiente = null;
 var periodo = "semana";
 var barrido = null;
+var modoAusentes = false;
+var sorteo = null;
 
 function nuevoDB(){
   return {
@@ -647,10 +656,32 @@ function asegurarClase(){
   var c = curso(); if(!c) return null;
   var cl = claseAbierta(c.id);
   if(cl) return cl;
-  cl = { id:uid(), cursoId:c.id, fecha:hoyISO(), ts:Date.now(), cerrada:false, fase:FASES[0].id, grupal:false };
+  cl = { id:uid(), cursoId:c.id, fecha:hoyISO(), ts:Date.now(), cerrada:false, fase:FASES[0].id, grupal:false, ausentes:{}, bolsa:[] };
   DB.clases.push(cl); guardar();
   return cl;
 }
+/* Las clases viejas no traen estos campos, así que siempre se leen con respaldo. */
+function ausentesDe(cl){ return (cl && cl.ausentes) || {}; }
+function nAusentes(cl){ return Object.keys(ausentesDe(cl)).length; }
+function presentesDe(c, cl){
+  var aus = ausentesDe(cl);
+  return alumnosDe(c).filter(function(a){ return !aus[a.id]; });
+}
+/* Bolsa sin reposición: todos salen una vez antes de que alguien repita.
+   Es azar de verdad y al mismo tiempo reparte parejo. */
+function sortear(c, cl){
+  var pool = presentesDe(c, cl);
+  if(!pool.length) return null;
+  var bolsa = cl.bolsa || [];
+  var faltan = pool.filter(function(a){ return bolsa.indexOf(a.id) === -1; });
+  var nueva = false;
+  if(!faltan.length){ bolsa = []; faltan = pool; nueva = true; }
+  var el = faltan[Math.floor(Math.random() * faltan.length)];
+  cl.bolsa = bolsa.concat([el.id]);
+  guardar();
+  return { id:el.id, nombre:el.nombre, quedan:faltan.length - 1, total:pool.length, nueva:nueva };
+}
+
 function regsDeClase(clId){ return DB.registros.filter(function(r){ return r.claseId === clId; }); }
 
 /* ========== prioridad viva ========== */
@@ -658,29 +689,37 @@ function prioridad(c, cl){
   if(!c) return [];
   var lista = clasesDe(c.id).slice(0, VENTANA);
   if(cl && lista.map(function(x){ return x.id; }).indexOf(cl.id) === -1) lista.unshift(cl);
-  var idx = {}; lista.forEach(function(x,i){ idx[x.id] = i; });
-  var ultLlam = {}, ultVol = {}, totalPar = {};
+  var porClase = {};
   DB.registros.forEach(function(r){
-    if(!(r.claseId in idx)) return;
     var a = ACC_BY_ID[r.accionId]; if(!a || a.f !== "par") return;
-    var i = idx[r.claseId];
-    totalPar[r.alumnoId] = (totalPar[r.alumnoId] || 0) + 1;
-    if(a.k === "llamada" && (ultLlam[r.alumnoId] === undefined || i < ultLlam[r.alumnoId])) ultLlam[r.alumnoId] = i;
-    if(a.k === "voluntaria" && (ultVol[r.alumnoId] === undefined || i < ultVol[r.alumnoId])) ultVol[r.alumnoId] = i;
+    (porClase[r.claseId] = porClase[r.claseId] || []).push({ al:r.alumnoId, k:a.k });
   });
-  var arr = alumnosDe(c).map(function(a){
-    var l = ultLlam[a.id] === undefined ? VENTANA : ultLlam[a.id];
-    var v = ultVol[a.id] === undefined ? VENTANA : ultVol[a.id];
-    return { id:a.id, nombre:a.nombre, score:l + v, llam:l, vol:v, tot:totalPar[a.id] || 0 };
+  var arr = presentesDe(c, cl).map(function(a){
+    var i = 0, l = null, v = null, tot = 0, faltas = 0;
+    lista.forEach(function(x){
+      if(ausentesDe(x)[a.id]){ faltas++; return; }
+      (porClase[x.id] || []).forEach(function(r){
+        if(r.al !== a.id) return;
+        tot++;
+        if(r.k === "llamada" && l === null) l = i;
+        if(r.k === "voluntaria" && v === null) v = i;
+      });
+      i++;
+    });
+    var ll = (l === null ? i : l), vv = (v === null ? i : v);
+    return { id:a.id, nombre:a.nombre, score:ll + vv, llam:ll, vol:vv,
+             tot:tot, presentes:i, faltas:faltas, nuncaLlam:l === null, nuncaVol:v === null };
   });
   arr.sort(function(x,y){ return (y.score - x.score) || (x.tot - y.tot) || x.nombre.localeCompare(y.nombre,"es"); });
-  var n = Math.max(1, Math.round(alumnosDe(c).length * 0.10));
+  var n = Math.max(1, Math.round(presentesDe(c, cl).length * 0.10));
   return arr.slice(0, n);
 }
 function razon(p){
-  if(p.llam >= VENTANA && p.vol >= VENTANA) return "sin registros de participación";
-  if(p.llam >= p.vol) return p.llam >= VENTANA ? "no lo llamas en la ventana" : "no lo llamas hace " + p.llam + (p.llam === 1 ? " clase" : " clases");
-  return p.vol >= VENTANA ? "sin participación voluntaria" : "sin participar hace " + p.vol + (p.vol === 1 ? " clase" : " clases");
+  var extra = p.faltas ? " · faltó " + p.faltas + (p.faltas === 1 ? " vez" : " veces") : "";
+  if(!p.presentes) return "no ha estado en las últimas clases";
+  if(p.nuncaLlam && p.nuncaVol) return "sin participar en " + p.presentes + (p.presentes === 1 ? " clase" : " clases") + extra;
+  if(p.llam >= p.vol) return (p.nuncaLlam ? "nunca lo llamas" : "no lo llamas hace " + p.llam + (p.llam === 1 ? " clase" : " clases")) + extra;
+  return (p.nuncaVol ? "nunca participa por iniciativa propia" : "sin participar hace " + p.vol + (p.vol === 1 ? " clase" : " clases")) + extra;
 }
 
 /* ========== registrar ========== */
@@ -777,6 +816,13 @@ function csv(){
     filas.push([ "interaccion", c?c.nombre:"", cl?cl.fecha:"", hora(r.ts), nombreFase(r.fase), al?al.nombre:"",
       FAM_BY_ID[a.f].t, a.t, a.k||"", a.boss||"", r.grupal?"sí":"no", a.s>0?"+":(a.s<0?"-":"0"), r.nota||"" ]);
   });
+  DB.clases.slice().sort(function(a,b){ return a.ts - b.ts; }).forEach(function(cl){
+    var cc = DB.cursos.filter(function(x){ return x.id === cl.cursoId; })[0];
+    Object.keys(ausentesDe(cl)).forEach(function(aid){
+      var al = cc ? alumno(cc, aid) : null;
+      filas.push([ "ausencia", cc?cc.nombre:"", cl.fecha, "", "", al?al.nombre:"", "Asistencia", "Ausente", "", "", "", "", "" ]);
+    });
+  });
   DB.barridos.slice().sort(function(a,b){ return a.ts - b.ts; }).forEach(function(b){
     var c = DB.cursos.filter(function(x){ return x.id === b.cursoId; })[0];
     var cl = DB.clases.filter(function(x){ return x.id === b.claseId; })[0];
@@ -835,6 +881,7 @@ function render(){
   if(!c && vista !== "config" && vista !== "inicio" && vista !== "quienes"){ vista = "config"; }
   document.body.setAttribute("data-vista", vista);
   if(vista === "inicio")      html = vistaInicio(c);
+  else if(vista === "clase" && modoAusentes) html = vistaAusentes(c);
   else if(vista === "clase" && barrido) html = vistaBarrido(c);
   else if(vista === "clase")  html = vistaClase(c);
   else if(vista === "cierre") html = vistaCierre(c);
@@ -902,7 +949,7 @@ function vistaClase(c){
     var a = ACC_BY_ID[r.accionId]; if(!a) return;
     (porAlumno[r.alumnoId] = porAlumno[r.alumnoId] || []).push(a.f);
   });
-  var sinNada = alumnosDe(c).filter(function(a){ return !porAlumno[a.id]; }).length;
+  var sinNada = presentesDe(c, cl).filter(function(a){ return !porAlumno[a.id]; }).length;
 
   var s = "";
   s += '<header class="topbar"><div class="gut">';
@@ -921,11 +968,17 @@ function vistaClase(c){
     : '<button type="button" class="next-btn" data-act="fase-next">Siguiente<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
   s += '</div>';
   s += '<div class="grupal"><span>Trabajo grupal</span><button type="button" class="sw" role="switch" aria-checked="' + (cl.grupal?"true":"false") + '" aria-label="Trabajo grupal" data-act="grupal"><i></i></button></div>';
+  var nAus = nAusentes(cl);
+  s += '<div class="grupal"><span>' + (nAus ? nAus + (nAus === 1 ? " ausente hoy" : " ausentes hoy") : "Sin ausentes marcados") + '</span>' +
+    '<button type="button" class="btn-hdr" data-act="ausentes-ini">' + (nAus ? "Cambiar" : "Marcar") + '</button></div>';
   s += '</div></header>';
 
-  if(prio.length){
+  if(presentesDe(c, cl).length){
     s += '<section class="prio" aria-label="Prioridad de participación"><div class="gut">' +
-      '<div class="prio-head"><span class="eyebrow">Pregúntale a</span><small>se actualiza solo</small></div><div class="prio-list">';
+      '<div class="prio-head"><span class="eyebrow">Pregúntale a</span>' +
+      '<button type="button" class="btn-azar" data-act="sortear">' +
+      '<svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2.2" y="2.2" width="11.6" height="11.6" rx="3" stroke="currentColor" stroke-width="1.6"/><circle cx="5.6" cy="5.6" r="1.15" fill="currentColor"/><circle cx="10.4" cy="10.4" r="1.15" fill="currentColor"/><circle cx="10.4" cy="5.6" r="1.15" fill="currentColor"/><circle cx="5.6" cy="10.4" r="1.15" fill="currentColor"/></svg>' +
+      'Al azar</button></div><div class="prio-list">';
     prio.forEach(function(p){ s += '<button type="button" class="prio-chip" data-act="abrir" data-id="' + p.id + '">' + h(corto(p.nombre)) + '</button>'; });
     s += '</div></div></section>';
   }
@@ -978,7 +1031,7 @@ function vistaClase(c){
         var aid = (sala.asientos || {})[key];
         var al = aid ? alumno(c, aid) : null;
         if(!al){ s += '<div class="seat vacio"><span>' + (fi+1) + '·' + (ci+1) + '</span></div>'; continue; }
-        s += '<button type="button" class="seat' + (prioIds[al.id] ? " is-prio" : "") + '" data-act="abrir" data-id="' + al.id + '">' +
+        s += '<button type="button" class="seat' + (prioIds[al.id] ? " is-prio" : "") + (ausentesDe(cl)[al.id] ? " ausente" : "") + '" data-act="abrir" data-id="' + al.id + '">' +
           '<b>' + h(corto(al.nombre)) + '</b>' + puntos(al) +
           '<span class="pos" style="position:absolute;top:5px;right:6px">' + (fi+1) + '·' + (ci+1) + '</span></button>';
       }
@@ -989,7 +1042,7 @@ function vistaClase(c){
       s += '<div style="margin-top:14px"><span class="eyebrow" style="color:var(--fg-2)">Sin puesto asignado</span>' +
         '<div class="grid" style="padding-top:8px">' +
         sp.map(function(a){
-          return '<button type="button" class="tile' + (prioIds[a.id] ? " is-prio" : "") + '" data-act="abrir" data-id="' + a.id + '">' +
+          return '<button type="button" class="tile' + (prioIds[a.id] ? " is-prio" : "") + (ausentesDe(cl)[a.id] ? " ausente" : "") + '" data-act="abrir" data-id="' + a.id + '">' +
             '<b>' + h(corto(a.nombre)) + '</b>' + puntos(a) + '</button>';
         }).join("") + '</div></div>';
     }
@@ -997,7 +1050,7 @@ function vistaClase(c){
   } else {
     s += '<div class="grid">';
     alumnosDe(c).forEach(function(a){
-      s += '<button type="button" class="tile' + (prioIds[a.id] ? " is-prio" : "") + '" data-act="abrir" data-id="' + a.id + '">' +
+      s += '<button type="button" class="tile' + (prioIds[a.id] ? " is-prio" : "") + (ausentesDe(cl)[a.id] ? " ausente" : "") + '" data-act="abrir" data-id="' + a.id + '">' +
         '<b>' + h(corto(a.nombre)) + '</b>' + puntos(a) + '</button>';
     });
     s += '</div>';
@@ -1133,12 +1186,39 @@ function contador(etiqueta, valor, campo){
     '</div></div>';
 }
 
+/* ---- marcar ausentes ---- */
+function vistaAusentes(c){
+  var cl = asegurarClase();
+  var aus = ausentesDe(cl);
+  var n = Object.keys(aus).length;
+  var s = '<header class="topbar"><div class="gut"><div class="toprow">' +
+    '<div style="flex:1;min-width:0"><b style="font-family:var(--display);font-size:18px;font-weight:700">Ausentes</b>' +
+    '<div style="font-size:12px;color:var(--on-navy-2)">' + h(c.nombre) + ' · ' + fechaLarga(cl.fecha) + '</div></div>' +
+    '<button type="button" class="icon-btn" data-act="ausentes-ok" aria-label="Listo">' +
+    '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>' +
+    '</div></div></header>';
+  s += '<div class="gut" style="padding-block:13px 0"><p class="dato" style="margin:0">Toca a quienes no vinieron. Un ausente no entra en la lista de prioridad, no sale en el sorteo y no cuenta como invisible.</p></div>';
+  s += '<main class="gut"><div class="grid">';
+  alumnosDe(c).forEach(function(a){
+    var m = !!aus[a.id];
+    s += '<button type="button" class="tile' + (m ? " ausente" : "") + '" data-act="ausente-tog" data-id="' + a.id + '"' +
+      ' aria-pressed="' + (m ? "true" : "false") + '">' +
+      '<b>' + h(corto(a.nombre)) + '</b>' +
+      '<span class="pos" style="position:absolute;bottom:6px;right:7px;font-size:9.5px">' + (m ? "ausente" : "") + '</span></button>';
+  });
+  s += '</div></main>';
+  s += '<div class="footbar"><div class="gut"><div class="meta">' +
+    '<small>Marcados como ausentes</small><b class="num">' + n + ' de ' + alumnosDe(c).length + '</b></div>' +
+    '<button type="button" class="btn" data-act="ausentes-ok">Listo</button></div></div>';
+  return s;
+}
+
 /* ---- barrido de práctica ---- */
 function vistaBarrido(c){
   var cl = asegurarClase();
   var fase = FASES.filter(function(f){ return f.id === cl.fase; })[0] || FASES[0];
   var marcadas = Object.keys(barrido.marcas).length;
-  var total = alumnosDe(c).length;
+  var total = presentesDe(c, cl).length;
 
   var s = '<header class="topbar"><div class="gut">';
   s += '<div class="toprow"><div style="flex:1;min-width:0">' +
@@ -1162,7 +1242,7 @@ function vistaBarrido(c){
   s += '</div>';
 
   s += '<main class="gut"><div class="grid">';
-  alumnosDe(c).forEach(function(a){
+  presentesDe(c, cl).forEach(function(a){
     var m = barrido.marcas[a.id];
     var b = m ? BAR_BY_ID[m] : null;
     s += '<button type="button" class="tile" data-act="barrido-marca" data-id="' + a.id + '"' +
@@ -1195,6 +1275,7 @@ function hojaAcciones(c, alumnoId){
     (nHoy ? nHoy + (nHoy===1?" registro":" registros") + " hoy" : "sin registros hoy") + '</small></div>' +
     '<button type="button" class="icon-btn" data-act="cerrar-hoja" aria-label="Cerrar" style="background:var(--surface-2);color:var(--fg)">' +
     '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button></div>';
+  if(ausentesDe(cl)[alumnoId]) s += '<div class="note"><i></i><span>Está marcado como ausente hoy. Si lo registras, quítale la marca desde Ausentes para que los conteos cuadren.</span></div>';
   if(cl.grupal) s += '<div class="note"><i></i><span>Trabajo grupal activo: lo que marques como fuera de tarea queda con esa marca.</span></div>';
   s += '</div></div>';
 
@@ -1219,7 +1300,7 @@ function vistaCierre(c){
   var cl = asegurarClase();
   var regs = regsDeClase(cl.id);
   var pend = regs.filter(function(r){ var a = ACC_BY_ID[r.accionId]; return a && a.otro && !String(r.nota||"").trim(); });
-  var sinNada = alumnosDe(c).filter(function(a){ return !regs.some(function(r){ return r.alumnoId === a.id; }); });
+  var sinNada = presentesDe(c, cl).filter(function(a){ return !regs.some(function(r){ return r.alumnoId === a.id; }); });
   var elogios = regs.filter(function(r){ var a = ACC_BY_ID[r.accionId]; return a && a.elogioEsp; }).length;
   var atenciones = regs.filter(function(r){ return r.accionId === "d-atencion"; }).length;
   var fdt = regs.filter(function(r){ var a = ACC_BY_ID[r.accionId]; return a && a.f === "fdt"; });
@@ -1251,10 +1332,10 @@ function vistaCierre(c){
     s += '</div></section>';
   }
 
-  s += '<section class="card"><h3>Resumen de la clase</h3><div class="sub">' + regs.length + ' registros en ' + alumnosDe(c).length + ' estudiantes</div>' +
+  s += '<section class="card"><h3>Resumen de la clase</h3><div class="sub">' + regs.length + ' registros · ' + presentesDe(c, cl).length + ' presentes de ' + alumnosDe(c).length + (nAusentes(cl) ? ' · ' + nAusentes(cl) + ' ausentes' : '') + '</div>' +
     '<div class="stats">' +
     stat(regs.filter(function(r){ var a=ACC_BY_ID[r.accionId]; return a && a.f==="par"; }).length, "registros de participación", "par") +
-    stat(sinNada.length, "sin ningún registro", "fdt") +
+    stat(sinNada.length, "presentes sin ningún registro", "fdt") +
     stat(elogios, "veces que felicitaste nombrando la conducta", "doc") +
     stat(atenciones, "llamados de atención", "doc") +
     '</div>';
@@ -1303,7 +1384,14 @@ function consolidar(c, p){
   alumnosDe(c).forEach(function(a){
     A[a.id] = { id:a.id, n:corto(a.nombre), vol:0, llam:0, fdt:0, motor:0, verbal:0, pasivo:0,
                 noIni:0, noResp:0, aten:0, explica:0, daResp:0, aplica:0, total:0, acc:{},
-                bar:{ ok:0, err:0, av:0, no:0, tot:0 } };
+                bar:{ ok:0, err:0, av:0, no:0, tot:0 }, aus:0 };
+  });
+  var clasesPeriodo = DB.clases.filter(function(x){ return x.cursoId === c.id && x.ts >= r.desde; });
+  var totalAusencias = 0;
+  clasesPeriodo.forEach(function(x){
+    Object.keys(ausentesDe(x)).forEach(function(aid){
+      if(A[aid]){ A[aid].aus++; totalAusencias++; }
+    });
   });
   var barridos = DB.barridos.filter(function(b){ return b.cursoId === c.id && b.ts >= r.desde; });
   var barTot = { ok:0, err:0, av:0, no:0 };
@@ -1349,7 +1437,7 @@ function consolidar(c, p){
     elogEsp:elogEsp, elogGen:elogGen, norma:norma, faseTop:faseTop, fasesFdt:fasesFdt,
     totFdt:arr.reduce(function(s,o){ return s + o.fdt; }, 0),
     totExplica:totExplica, totDaResp:totDaResp, totAplica:totAplica,
-    barridos:barridos, barTot:barTot
+    barridos:barridos, barTot:barTot, totalAusencias:totalAusencias, nClasesPeriodo:clasesPeriodo.length
   };
 }
 
@@ -1391,7 +1479,8 @@ function vistaConsolidado(c){
     stat(k.nRegs, "registros en total", "par") +
     stat(k.nClases ? Math.round(k.nRegs / k.nClases) : 0, "registros por clase", "doc") +
     stat(k.sinNada.length, "estudiantes sin ningún registro", "fdt") +
-    '</div>';
+    '</div>' +
+    (k.totalAusencias ? '<p class="dato">' + k.totalAusencias + (k.totalAusencias === 1 ? " ausencia registrada" : " ausencias registradas") + ' en el periodo. Las clases en que un estudiante faltó no cuentan en su contra en la lista de prioridad.</p>' : '');
   if(k.sinNada.length) s += '<div class="chips">' + k.sinNada.slice(0,12).map(function(o){ return '<span class="chip-n">' + h(o.n) + '</span>'; }).join("") +
     (k.sinNada.length > 12 ? '<span class="chip-n">y ' + (k.sinNada.length - 12) + ' más</span>' : '') + '</div>';
   s += '</section>';
@@ -1402,8 +1491,9 @@ function vistaConsolidado(c){
   var invis = k.arr.slice().sort(function(a,b){ return a.turnos - b.turnos || a.n.localeCompare(b.n,"es"); }).slice(0,6);
   s += '<section class="card"><h3>Los invisibles</h3><div class="sub">Los que menos aparecieron en el periodo</div>';
   s += invis.map(function(o){
+    var falt = o.aus ? " · faltó " + o.aus + (o.aus === 1 ? " vez" : " veces") : "";
     return '<div class="row"><i style="background:var(--' + (o.turnos ? "par" : "fdt") + '-dot)"></i><b>' + h(o.n) + '</b>' +
-      '<small>' + (o.turnos ? o.turnos + (o.turnos === 1 ? " turno" : " turnos") + " en " + k.nClases + (k.nClases === 1 ? " clase" : " clases") : "sin participar en todo el periodo") + '</small></div>';
+      '<small>' + (o.turnos ? o.turnos + (o.turnos === 1 ? " turno" : " turnos") + " en " + k.nClases + (k.nClases === 1 ? " clase" : " clases") : "sin participar en todo el periodo") + falt + '</small></div>';
   }).join("");
   s += '<p class="dato">El tercio más activo del curso (' + k.tercio + ' estudiantes) se lleva el <b>' + k.concTurnos + '%</b> de los turnos. Si fuera parejo sería 33%.</p>' +
     '<div class="meter"><i style="width:' + k.concTurnos + '%;background:var(--par-dot)"></i></div></section>';
@@ -1955,6 +2045,19 @@ function modalHTML(c){
     });
     s += '</div><button type="button" class="btn ghost wide" data-act="cerrar-modal">Cancelar</button>';
   }
+  else if(modal.m === "sorteo"){
+    if(!sorteo) s += '<p class="vacio">No hay estudiantes presentes para sortear.</p>';
+    else {
+      s += '<div class="sorteo-caja"><b>' + h(corto(sorteo.nombre)) + '</b>' +
+        '<small>' + (sorteo.quedan > 0
+          ? "Quedan " + sorteo.quedan + " por salir antes de que alguien repita"
+          : "Con este salieron los " + sorteo.total + ". El próximo empieza una ronda nueva.") + '</small></div>';
+      if(sorteo.nueva) s += '<p class="dato" style="margin-top:-4px">Empezó una ronda nueva: todos vuelven a la bolsa.</p>';
+      s += '<div class="btn-row"><button type="button" class="btn accent" data-act="sorteo-reg" data-id="' + sorteo.id + '">Registrar</button>' +
+        '<button type="button" class="btn ghost" data-act="sortear">Otro nombre</button></div>';
+    }
+    s += '<button type="button" class="link" data-act="cerrar-modal" style="align-self:flex-start">Cerrar</button>';
+  }
   else if(modal.m === "restaurar"){
     if(APP_PROPIA) s += '<label class="btn ghost wide file-label" for="f-bak">Elegir el archivo de respaldo' +
       '<input type="file" id="f-bak" accept=".json,application/json"></label>';
@@ -2173,6 +2276,22 @@ document.addEventListener("click", function(ev){
     } else delete c.sala.asientos[kk];
     guardar(); modal = null; render(); return;
   }
+  if(act === "ausentes-ini"){ modoAusentes = true; cerrarToast(); render(); window.scrollTo(0,0); return; }
+  if(act === "ausentes-ok"){ modoAusentes = false; render(); window.scrollTo(0,0); return; }
+  if(act === "ausente-tog"){
+    var clA = asegurarClase();
+    clA.ausentes = clA.ausentes || {};
+    if(clA.ausentes[id]) delete clA.ausentes[id]; else clA.ausentes[id] = true;
+    guardar(); render(); return;
+  }
+  if(act === "sortear"){
+    var clS = asegurarClase();
+    sorteo = sortear(c, clS);
+    modal = { m:"sorteo", titulo:"Llamada directa al azar" };
+    cerrarToast(); render(); return;
+  }
+  if(act === "sorteo-reg"){ modal = null; sheetAlumno = id; render(); return; }
+
   if(act === "barrido-ini"){ barrido = { marcas:{}, pincel:"ok" }; cerrarToast(); render(); window.scrollTo(0,0); return; }
   if(act === "pincel"){ barrido.pincel = id; render(); return; }
   if(act === "barrido-marca"){
@@ -2304,7 +2423,8 @@ document.addEventListener("click", function(ev){
     return;
   }
   if(act === "ejemplo"){
-    var nombres = ["Agustín Barraza","Antonia Castro","Benjamín Rojas","Bruno Kast","Catalina Vera","Diego Muñoz","Emilia Salas","Facundo Ortiz","Florencia Lagos","Gabriel Tapia","Ignacio Peña","Isidora Nieto","Joaquín Araya","Josefa Pino","Lucas Guzmán","Magdalena Riquelme","Martín Escobar","Martina Soto","Matías Quiroz","Paz Herrera","Renato Fuentes","Sofía Zúñiga","Tomás Ibáñez","Valentina Díaz"];
+    /* En orden chileno, apellidos primero, que es como vienen las nóminas reales. */
+    var nombres = ["BARRAZA SOTO AGUSTÍN","CASTRO LEIVA ANTONIA","ROJAS DÍAZ BENJAMÍN","KAST MOLINA BRUNO","VERA ALDANA CATALINA","MUÑOZ DE LA FUENTE DIEGO","SALAS ORREGO EMILIA","ORTIZ BRAVO FACUNDO","LAGOS PARRA FLORENCIA","TAPIA MEDEL GABRIEL","PEÑA CORTÉS IGNACIO","NIETO SALDÍVAR ISIDORA","ARAYA FIGUEROA JOAQUÍN","PINO VALDÉS JOSEFA","GUZMÁN ROMERO LUCAS","RIQUELME ABARCA MAGDALENA","ESCOBAR PIZARRO MARTÍN","SOTO PÉREZ MARTINA","QUIROZ NAVARRO MATÍAS","HERRERA GALLARDO PAZ","FUENTES CÁCERES RENATO","ZÚÑIGA MELLADO SOFÍA","IBÁÑEZ CONTRERAS TOMÁS","DÍAZ ARRIAGADA VALENTINA"];
     var ej = { id:uid(), nombre:"6°A (ejemplo)", asignatura:"Matemática", estudiantes:nombres.map(function(n){ return { id:uid(), nombre:n }; }) };
     DB.cursos.push(ej); DB.cursoActivo = ej.id; guardar(); vista = "clase"; render(); window.scrollTo(0,0);
     toast("Curso de ejemplo cargado. Bórralo desde Ajustes cuando quieras.", null); render();
