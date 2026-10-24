@@ -1,11 +1,20 @@
 /* Turnos · Savia Educa
-   Trabajador de red: guarda la app para que abra sin internet.
-   Estrategia: primero la red, y si no hay, lo guardado. Así siempre
-   ves la versión más nueva cuando hay señal, y funciona igual sin ella.
-   Solo toca archivos de este mismo sitio; las tipografías de Google
-   quedan fuera y, sin internet, el navegador usa las de respaldo. */
+   Trabajador de red v2.
 
-var CACHE = "turnos-v1";
+   Estrategia: caché primero con revalidación en segundo plano.
+   Responde al instante con lo guardado y pide la versión nueva por detrás,
+   que queda lista para la próxima apertura.
+
+   Por qué no red primero: el wifi de colegio suele conectar sin navegar.
+   Con red primero la app se quedaba esperando el tiempo de espera completo
+   y parecía que no abría. Con caché primero abre igual de rápido con señal,
+   sin señal, o con señal que no sirve.
+
+   Consecuencia al desarrollar: un cambio se ve en la segunda apertura.
+   En las herramientas del navegador, Application → Service Workers →
+   marcar "Update on reload". */
+
+var CACHE = "turnos-v2";
 var ARCHIVOS = [
   "./",
   "./index.html",
@@ -41,16 +50,19 @@ self.addEventListener("fetch", function (e) {
   if (url.origin !== self.location.origin) return;
 
   e.respondWith(
-    fetch(e.request).then(function (r) {
-      var copia = r.clone();
-      caches.open(CACHE).then(function (c) {
-        try { c.put(e.request, copia); } catch (err) {}
-      });
-      return r;
-    }).catch(function () {
-      return caches.match(e.request).then(function (guardado) {
+    caches.match(e.request).then(function (guardado) {
+      var red = fetch(e.request).then(function (r) {
+        if (r && r.ok) {
+          var copia = r.clone();
+          caches.open(CACHE).then(function (c) {
+            try { c.put(e.request, copia); } catch (err) {}
+          });
+        }
+        return r;
+      }).catch(function () {
         return guardado || caches.match("./index.html");
       });
+      return guardado || red;
     })
   );
 });

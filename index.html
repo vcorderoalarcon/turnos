@@ -9,16 +9,15 @@ html, body { height: 100%; }
 body { margin: 0; font-size: 14px; -webkit-text-size-adjust: 100%; }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
-</style>
-<title>Turnos</title>
+</style><title>Turnos</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0F4634">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Turnos">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="icono-180.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500..700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500..700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400..700&display=swap" media="print" onload="this.media='all'">
 <style>
 /* Layout: una columna en el teléfono, cabecera fija con la fase, grilla del curso de 4 columnas,
    hoja de acciones por familia, y una vista aparte de ancho completo para proyectar. */
@@ -357,6 +356,41 @@ textarea{ min-height:110px; resize:vertical; line-height:1.45; font-family:ui-mo
 .inicio-foot{ display:flex; flex-direction:column; align-items:center; gap:2px; margin-top:2px; }
 .inicio-foot small{ font-size:11.5px; color:var(--fg-3); letter-spacing:.03em; }
 
+/* ---------- resumen por estudiante ---------- */
+.est-cab{ display:flex; flex-direction:column; gap:3px; }
+.est-cab h2{ margin:0; font-family:var(--display); font-size:clamp(23px,6.6vw,28px); font-weight:600; line-height:1.15; color:var(--par-ink); }
+.est-cab small{ font-size:12px; color:var(--fg-2); }
+.franja{ display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
+.franja i{ width:9px; height:9px; border-radius:999px; background:var(--surface-2); }
+.franja i.on{ background:var(--par-dot); }
+.franja i.aus{ background:transparent; border:1px dashed var(--fg-3); }
+.est-tar{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:14px 13px 15px; }
+.est-tar.doc{ border:2px solid var(--doc-dot); background:var(--doc-wash); }
+.est-tar h3{ margin:0; font-size:14.5px; }
+.est-tar .lema{ font-size:11.5px; font-style:italic; color:var(--doc-ink); margin:3px 0 0; }
+.est-lin{ display:flex; align-items:baseline; gap:9px; padding:7px 0; border-top:1px solid var(--line); }
+.est-lin:first-of-type{ border-top:0; }
+.est-tar.doc .est-lin{ border-color:rgba(0,0,0,.08); }
+.est-lin span{ flex:1; min-width:0; font-size:12.5px; line-height:1.3; }
+.est-lin b{ flex:none; font-size:14px; font-variant-numeric:tabular-nums; }
+.est-lin.cero span, .est-lin.cero b{ color:var(--fg-3); }
+.nota-pie{ margin:11px 0 0; padding:10px 11px; border-radius:11px; background:var(--surface-2); font-size:12px; line-height:1.55; }
+.est-tar.doc .nota-pie{ background:var(--surface); }
+.nota-pie.ojo{ background:var(--orange-wash); color:var(--orange-ink); }
+.est-cierre{ background:var(--par-wash); border-radius:16px; padding:16px 15px 18px; display:flex; flex-direction:column; gap:10px; }
+.est-tar .sub{ font-size:11.5px; color:var(--fg-2); margin-top:3px; }
+.est-tar.doc .sub{ color:var(--doc-ink); }
+button.row{ width:100%; min-height:44px; background:transparent; border:0; border-top:1px solid var(--line);
+  font:inherit; color:inherit; text-align:left; cursor:pointer; }
+button.row .grow{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+button.row .chev{ flex:none; color:var(--fg-3); font-size:15px; line-height:1; }
+.nombres{ display:flex; flex-wrap:wrap; gap:6px; }
+.nombres button{ min-height:36px; padding:0 12px; border-radius:999px; background:var(--surface-2);
+  border:1px solid var(--line); font:inherit; font-size:12.5px; font-weight:600; color:var(--fg); cursor:pointer; }
+.est-cierre h3{ margin:0; font-family:var(--display); font-size:16px; font-weight:600; color:var(--par-ink); }
+.est-cierre p{ margin:0; font-size:13px; line-height:1.65; }
+.hueco{ display:inline-block; min-width:120px; border-bottom:1.5px dashed var(--fg-3); }
+
 /* ---------- quiénes somos ---------- */
 .qs{ background:var(--surface-2); }
 .qs .gut{ padding-block:24px; padding-bottom:calc(30px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:26px; }
@@ -490,6 +524,8 @@ var periodo = "semana";
 var barrido = null;
 var modoAusentes = false;
 var sorteo = null;
+var estudiante = null;
+var estudianteVuelve = "consolidado";
 
 function nuevoDB(){
   return {
@@ -886,6 +922,7 @@ function render(){
   else if(vista === "clase")  html = vistaClase(c);
   else if(vista === "cierre") html = vistaCierre(c);
   else if(vista === "consolidado") html = vistaConsolidado(c);
+  else if(vista === "estudiante") html = vistaEstudiante(c);
   else if(vista === "sala")   html = vistaSala(c);
   else if(vista === "quienes") html = vistaQuienes();
   else if(vista === "curso")  html = vistaCurso(c);
@@ -1277,6 +1314,7 @@ function hojaAcciones(c, alumnoId){
     '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button></div>';
   if(ausentesDe(cl)[alumnoId]) s += '<div class="note"><i></i><span>Está marcado como ausente hoy. Si lo registras, quítale la marca desde Ausentes para que los conteos cuadren.</span></div>';
   if(cl.grupal) s += '<div class="note"><i></i><span>Trabajo grupal activo: lo que marques como fuera de tarea queda con esa marca.</span></div>';
+  s += '<button type="button" class="btn ghost wide" style="margin-top:9px" data-act="ver-est" data-id="' + alumnoId + '">Ver su resumen</button>';
   s += '</div></div>';
 
   s += '<div class="sheet-body"><div class="gut">';
@@ -1362,6 +1400,237 @@ function stat(v, t, tok){
   return '<div class="stat" style="background:var(--' + tok + '-wash);color:var(--' + tok + '-ink)"><b>' + v + '</b><small>' + h(t) + '</small></div>';
 }
 
+/* ---- resumen por estudiante ----
+   Todo lo de una persona en una pantalla. Es la única vista que responde
+   "cómo trato yo a este estudiante", porque la familia doc solo existe
+   hoy como promedio del curso. Los textos del catálogo van literales. */
+
+function diasDesde(ts){
+  var a = new Date(ts); a.setHours(0,0,0,0);
+  var b = new Date(); b.setHours(0,0,0,0);
+  return Math.round((b - a) / 86400000);
+}
+function ultimoCorto(ts){
+  if(!ts) return { v:"—", t:"sin turnos en el periodo" };
+  var dd = diasDesde(ts);
+  if(dd <= 0) return { v:"Hoy", t:"tuvo su último turno" };
+  if(dd === 1) return { v:"Ayer", t:"tuvo su último turno" };
+  return { v:dd, t:"días desde su último turno" };
+}
+function haceCuanto(ts){
+  if(!ts) return "nunca";
+  var d = diasDesde(ts);
+  return d <= 0 ? "hoy" : (d === 1 ? "ayer" : "hace " + d + " días");
+}
+
+function datosEstudiante(c, aid){
+  var r = rangoPeriodo(periodo);
+  var regs = DB.registros.filter(function(x){ return x.cursoId === c.id && x.alumnoId === aid && x.ts >= r.desde; });
+  var clases = DB.clases.filter(function(x){ return x.cursoId === c.id && x.ts >= r.desde; })
+    .sort(function(a,b){ return a.ts - b.ts; });
+  var presentes = clases.filter(function(x){ return !ausentesDe(x)[aid]; });
+  var ausencias = clases.length - presentes.length;
+
+  var cuenta = {}, porFam = { par:0, fdt:0, doc:0, pares:0 };
+  var ultimoPar = 0, vol = 0, llam = 0, boss = { motor:0, verbal:0, pasivo:0 }, fases = {};
+  regs.forEach(function(x){
+    var a = ACC_BY_ID[x.accionId]; if(!a) return;
+    cuenta[x.accionId] = (cuenta[x.accionId] || 0) + 1;
+    porFam[a.f] = (porFam[a.f] || 0) + 1;
+    if(a.f === "par"){
+      if(x.ts > ultimoPar) ultimoPar = x.ts;
+      if(a.k === "voluntaria") vol++;
+      if(a.k === "llamada") llam++;
+    }
+    if(a.f === "fdt"){
+      if(a.boss) boss[a.boss]++;
+      fases[x.fase] = (fases[x.fase] || 0) + 1;
+    }
+  });
+
+  var conPar = {};
+  regs.forEach(function(x){ var a = ACC_BY_ID[x.accionId]; if(a && a.f === "par") conPar[x.claseId] = true; });
+  var franja = clases.map(function(x){
+    return ausentesDe(x)[aid] ? "aus" : (conPar[x.id] ? "on" : "off");
+  });
+
+  var bar = { ok:0, err:0, av:0, no:0, tot:0 };
+  DB.barridos.forEach(function(b){
+    if(b.cursoId !== c.id || b.ts < r.desde) return;
+    var e = (b.marcas || {})[aid];
+    if(e && bar[e] !== undefined){ bar[e]++; bar.tot++; }
+  });
+
+  var faseTop = Object.keys(fases).sort(function(a,b){ return fases[b] - fases[a]; })[0];
+  return { etiqueta:r.t, regs:regs, cuenta:cuenta, porFam:porFam, ultimoPar:ultimoPar,
+           vol:vol, llam:llam, boss:boss, faseTop:faseTop, nFaseTop:faseTop ? fases[faseTop] : 0,
+           bar:bar, franja:franja, nClases:clases.length, nPresente:presentes.length,
+           ausencias:ausencias, clasesConRegistro:Object.keys(conPar).length };
+}
+
+function lineas(d, ids, tok, mostrarCeros){
+  var hay = ids.filter(function(x){ return d.cuenta[x]; });
+  if(!hay.length && !mostrarCeros) return '<p class="vacio">Sin registros de esta familia en el periodo.</p>';
+  return ids.map(function(x){
+    var n = d.cuenta[x] || 0;
+    if(!n && !mostrarCeros) return "";
+    return '<div class="est-lin' + (n ? "" : " cero") + '"><span>' + h(ACC_BY_ID[x].t) + '</span>' +
+      '<b' + (n ? ' style="color:var(--' + tok + '-ink)"' : '') + '>' + n + '</b></div>';
+  }).join("");
+}
+var BOSS_T = { motor:"se levanta o manipula", verbal:"conversa o interrumpe", pasivo:"mira a otro lado o no inicia" };
+function idsDe(fam){ return ACCIONES.filter(function(a){ return a.f === fam && !a.otro; }).map(function(a){ return a.id; }); }
+function nota(txt, ojo){ return '<p class="nota-pie' + (ojo ? " ojo" : "") + '">' + txt + '</p>'; }
+
+function vistaEstudiante(c){
+  var al = alumno(c, estudiante);
+  if(!al){ estudiante = null; return vistaConsolidado(c); }
+  var d = datosEstudiante(c, estudiante);
+  var cu = d.cuenta;
+
+  var s = '<header class="topbar"><div class="gut"><div class="toprow">' +
+    '<button type="button" class="icon-btn" data-act="cerrar-estudiante" aria-label="Volver">' +
+    '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 2L4 8l6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+    '<div style="flex:1;min-width:0"><b style="font-family:var(--display);font-size:17px;font-weight:700">Resumen</b>' +
+    '<div style="font-size:12px;color:var(--on-navy-2)">' + h(c.nombre) + ' · ' + h(d.etiqueta) + '</div></div>' +
+    '</div></div></header>';
+
+  s += '<div class="page"><div class="gut">';
+  s += '<div class="aviso">' + iconoInfo() + '<span><b>Pantalla privada: no la proyectes.</b> Y los conteos dependen de cuánto alcanzaste a registrar: un cero puede ser que no ocurrió o que no lo viste.</span></div>';
+
+  // 1 · Lo esencial
+  s += '<section class="est-tar"><div class="est-cab"><h2>' + h(corto(al.nombre)) + '</h2>' +
+    '<small>' + h(al.nombre) + '</small></div>' +
+    '<div class="stats" style="margin-top:12px">' +
+    stat(d.regs.length, "interacciones registradas", "par") +
+    stat(ultimoCorto(d.ultimoPar).v, ultimoCorto(d.ultimoPar).t, d.ultimoPar ? "ok" : "fdt") +
+    stat(d.clasesConRegistro + " de " + d.nPresente, "clases en que apareció, de las que asistió", "av") +
+    stat(d.ausencias, d.ausencias === 1 ? "ausencia en el periodo" : "ausencias en el periodo", "no") +
+    '</div>';
+  if(d.franja.length){
+    s += '<div style="margin-top:12px"><div class="eyebrow" style="color:var(--fg-2);margin-bottom:6px">Clase a clase</div>' +
+      '<div class="franja">' + d.franja.map(function(x){ return '<i class="' + (x === "off" ? "" : x) + '"></i>'; }).join("") + '</div>' +
+      '<p class="dato">Lleno si ese día tuvo algún turno. Punteado si faltó.</p></div>';
+  }
+  s += '</section>';
+
+  // 2 · Participación
+  s += '<section class="est-tar"><h3>Participación</h3>' +
+    '<div class="sub">Lo que hizo frente al curso</div>' + lineas(d, idsDe("par"), "par");
+  if(d.vol || d.llam){
+    s += '<div class="est-lin" style="border-top:1px solid var(--line);margin-top:4px">' +
+      '<span><b>Por iniciativa propia</b> contra <b>porque lo llamaste</b></span><b>' + d.vol + " · " + d.llam + '</b></div>';
+  }
+  var manoAlzada = cu["p-vol"] || 0, sinMano = cu["p-sin-mano"] || 0;
+  if(!d.vol && d.llam){
+    s += nota("Las " + d.llam + (d.llam === 1 ? " vez que habló fue" : " veces que habló fueron") + " porque lo llamaste. No levantó la mano en ninguna de las " + d.nPresente + " clases a las que asistió.", true);
+  } else if(!manoAlzada && sinMano){
+    s += nota("Participa, pero nunca levantando la mano: " + sinMano + (sinMano === 1 ? " vez respondió" : " veces respondió") + " sin pedir el turno. Es participación, y además es una norma que no está puesta.", true);
+  } else if(d.vol || d.llam){
+    s += nota("De " + (d.vol + d.llam) + " turnos, " + d.vol + " salieron por iniciativa propia y " + d.llam + " porque lo llamaste.");
+  } else {
+    s += nota("Sin participación registrada en el periodo.", true);
+  }
+  s += '</section>';
+
+  // 3 · Tu interacción
+  s += '<section class="est-tar doc"><h3>Tu interacción</h3>' +
+    '<p class="lema">No mide al estudiante, te mide a ti.</p>' +
+    '<div style="margin-top:10px">' + lineas(d, idsDe("doc"), "doc", true) + '</div>';
+  var nDoc = d.porFam.doc || 0, nPar = d.porFam.par || 0;
+  var aten = cu["d-atencion"] || 0, elog = cu["d-elog-esp"] || 0;
+  var notas = [];
+  if(nDoc > nPar && nDoc) notas.push("Le hablaste más de lo que habló: " + nDoc + " contra " + nPar + ".");
+  if(aten >= 2 && !elog) notas.push(aten + " de esas fueron para pedirle atención, y ninguna fue un elogio que nombrara qué hizo bien.");
+  if(elog) notas.push("Le diste " + elog + (elog === 1 ? " elogio que nombra la conducta concreta" : " elogios que nombran la conducta concreta") + ", que es la forma con respaldo. No hay una razón fija de elogios por reprimenda que perseguir.");
+  if(!nDoc) notas.push("No registraste ninguna interacción tuya con esta persona en el periodo.");
+  s += nota(notas.join(" "), (aten >= 2 && !elog) || nDoc > nPar);
+  s += '</section>';
+
+  // 4 · Práctica autónoma
+  s += '<section class="est-tar"><h3>Práctica autónoma</h3>' +
+    '<div class="sub">' + (d.bar.tot ? "Sobre " + d.bar.tot + (d.bar.tot === 1 ? " barrido" : " barridos") : "Sin barridos en el periodo") + '</div>';
+  if(d.bar.tot){
+    s += BARRIDO.map(function(b){
+      return '<div class="est-lin' + (d.bar[b.id] ? "" : " cero") + '"><span>' + h(b.t) + '</span>' +
+        '<b' + (d.bar[b.id] ? ' style="color:var(--' + b.tok + '-ink)"' : '') + '>' + d.bar[b.id] + '</b></div>';
+    }).join("");
+    if(!d.bar.no && d.bar.ok) s += nota("Trabaja. En ninguna revisión estaba sin empezar, y en " + d.bar.ok + " de " + d.bar.tot + " tenía la tarea terminada y correcta.");
+    else if(d.bar.no) s += nota("En " + d.bar.no + " de " + d.bar.tot + " revisiones no había empezado la tarea.", d.bar.no > d.bar.ok);
+    else s += nota("Revisado " + d.bar.tot + (d.bar.tot === 1 ? " vez" : " veces") + " en el periodo.");
+  } else {
+    s += '<p class="vacio">El barrido se hace desde la clase, en las fases de trabajo.</p>';
+  }
+  s += '</section>';
+
+  // 5 · Entre pares
+  s += '<section class="est-tar"><h3>Entre pares</h3>' +
+    '<div class="sub">Solo cuenta lo que alcanzaste a escuchar circulando</div>' + lineas(d, idsDe("pares"), "pares");
+  var pares = [];
+  if((cu["e-pide-exp"]||0) > (cu["e-pide-resp"]||0)) pares.push("Pide explicación, no la respuesta.");
+  if(cu["e-aplica"]) pares.push("Aplicó a su propia tarea la ayuda que recibió " + cu["e-aplica"] + (cu["e-aplica"] === 1 ? " vez" : " veces") + ". Es el mejor predictor de aprendizaje que tiene este instrumento.");
+  if((cu["e-explica"]||0) > 0 && (cu["e-da-resp"]||0) === 0) pares.push("Cuando ayuda, explica: nunca registraste que pasara la respuesta sin más.");
+  if(pares.length) s += nota(pares.join(" "));
+  s += '</section>';
+
+  // 6 · Fuera de tarea
+  s += '<section class="est-tar"><h3>Fuera de tarea</h3>' +
+    '<div class="sub">' + (d.porFam.fdt || 0) + " en el periodo" + '</div>' + lineas(d, idsDe("fdt"), "fdt");
+  if(d.porFam.fdt){
+    var tipos = ["motor","verbal","pasivo"].filter(function(t){ return d.boss[t]; });
+    s += '<div class="chips">' + tipos.map(function(t){
+      return '<span class="chip-n">' + d.boss[t] + " " + h(BOSS_T[t]) + '</span>'; }).join("") + '</div>';
+    var ft = d.faseTop ? (FASES.filter(function(f){ return f.id === d.faseTop; })[0] || {}).t : null;
+    if(tipos.length === 1 && tipos[0] === "pasivo"){
+      s += nota("Los " + d.boss.pasivo + " son del tipo que no se nota" + (ft ? ", y se concentran en " + h(ft) : "") + ". No interrumpe: se desconecta en silencio, que es lo que cuesta ver.", true);
+    } else if(ft){
+      s += nota("Se concentra en " + h(ft) + ": " + d.nFaseTop + " de " + d.porFam.fdt + ".");
+    }
+  }
+  s += '</section>';
+
+  // 7 · Cierre
+  s += cierreEstudiante(d, cu);
+  s += '<button type="button" class="btn ghost wide" data-act="cerrar-estudiante">Volver al consolidado</button>';
+  s += '</div></div>';
+  return s;
+}
+
+/* Dos párrafos armados con las mismas reglas de arriba. Nunca un veredicto
+   ni un rasgo: solo conducta observada y un paso concreto. El nombre de la
+   técnica se deja en blanco a propósito, porque sale del Compendio. */
+function cierreEstudiante(d, cu){
+  var lectura = [], paso = null;
+  var aten = cu["d-atencion"] || 0, elog = cu["d-elog-esp"] || 0;
+
+  if(!d.regs.length){
+    lectura.push("No hay registros de este estudiante en el periodo. Eso puede significar que no ocurrió nada que registraras, o que no alcanzaste a mirarlo.");
+    paso = "Ponle prioridad en la próxima clase y registra al menos una interacción, para saber de cuál de las dos se trata.";
+  } else {
+    if(!d.vol && d.llam) lectura.push("Habla cuando lo llamas y no por iniciativa propia.");
+    else if(d.vol && !d.llam) lectura.push("Participa solo por decisión propia: no registraste llamadas directas en el periodo.");
+    if(!(cu["p-vol"]||0) && (cu["p-sin-mano"]||0)) lectura.push("Cuando participa lo hace sin pedir el turno.");
+    if(d.bar.tot && !d.bar.no && d.bar.ok) lectura.push("Cuando revisaste su cuaderno, la tarea estaba hecha.");
+    if(d.bar.no && d.bar.no >= d.bar.ok) lectura.push("En las revisiones aparece más veces sin empezar que con la tarea terminada.");
+    if(d.boss.pasivo && !d.boss.motor && !d.boss.verbal) lectura.push("Su fuera de tarea es silencioso, no disruptivo.");
+    if(aten >= 2 && !elog) lectura.push("Tus interacciones fueron correctivas y ninguna fue de reconocimiento.");
+    if(cu["e-aplica"]) lectura.push("Usa la ayuda de sus compañeros en su propia tarea.");
+    if(!lectura.length) lectura.push("Los registros no muestran un patrón marcado en ninguna de las familias.");
+
+    if(aten >= 2 && !elog) paso = "La próxima vez que haga algo bien, nómbralo en voz alta diciendo qué hizo, no solo que estuvo bien.";
+    else if(!d.vol && d.llam) paso = "Avisa la pregunta con tiempo de pensar antes de pedir la respuesta, para que alcance a levantar la mano en vez de responder en frío.";
+    else if(d.bar.no && d.bar.no >= d.bar.ok) paso = "Revisa primero si el problema es el prerrequisito y no la conducta: siéntate al lado al empezar la práctica y mira dónde se traba.";
+    else if(d.boss.pasivo && !d.boss.motor && !d.boss.verbal) paso = "Pasa por su puesto al inicio de la práctica, antes de que se desconecte, y verifica que haya empezado.";
+  }
+
+  var s = '<section class="est-cierre"><h3>Qué se lee acá</h3>' +
+    '<p>' + h(lectura.join(" ")) + '</p>';
+  s += '<h3 style="margin-top:4px">Un paso posible</h3>';
+  s += '<p>' + (paso ? h(paso) : "Sin un paso evidente desde estos registros.") + '</p>';
+  s += '<p class="dato" style="margin-top:2px">Técnica del Compendio: <span class="hueco"></span></p>';
+  return s + '</section>';
+}
+
 /* ---- consolidado ---- */
 var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 
@@ -1419,6 +1688,13 @@ function consolidar(c, p){
     if(x.accionId === "e-explica"){ o.explica++; totExplica++; }
     if(x.accionId === "e-da-resp"){ o.daResp++; totDaResp++; }
     if(x.accionId === "e-aplica"){ o.aplica++; totAplica++; }
+  });
+  /* El "hace cuánto" se mide contra todo el historial, no contra el periodo:
+     que no haya participado esta semana no dice si fue ayer o hace un mes. */
+  DB.registros.forEach(function(x){
+    if(x.cursoId !== c.id) return;
+    var a = ACC_BY_ID[x.accionId], o = A[x.alumnoId];
+    if(a && o && a.f === "par" && x.ts > (o.ultimo || 0)) o.ultimo = x.ts;
   });
   var arr = Object.keys(A).map(function(k){ return A[k]; });
   arr.forEach(function(o){ o.turnos = o.vol + o.llam; o.noSigue = o.noIni + o.noResp + o.aten; });
@@ -1489,11 +1765,24 @@ function vistaConsolidado(c){
     barras(k.orden.map(function(o){ return { n:o.n, v:o.turnos, d:o.vol + " por iniciativa propia · " + o.llam + " porque lo llamaste" }; }), "par") + '</section>';
 
   var invis = k.arr.slice().sort(function(a,b){ return a.turnos - b.turnos || a.n.localeCompare(b.n,"es"); }).slice(0,6);
+  /* Solo navegación: quién está en cero ya lo dice la tarjeta de abajo,
+     y pintar 23 de 24 en naranjo es una alarma que no informa nada. */
+  s += '<section class="card"><h3>Ver a un estudiante</h3>' +
+    '<div class="sub">Todo lo suyo en una pantalla, incluido lo que hiciste tú</div>' +
+    '<div class="nombres">' + k.arr.slice().sort(function(a,b){
+      return (a.n || "").localeCompare(b.n || "", "es");
+    }).map(function(o){
+      return '<button type="button" data-act="ver-est" data-id="' + o.id + '">' + h(o.n) + '</button>';
+    }).join("") + '</div></section>';
+
   s += '<section class="card"><h3>Los invisibles</h3><div class="sub">Los que menos aparecieron en el periodo</div>';
   s += invis.map(function(o){
     var falt = o.aus ? " · faltó " + o.aus + (o.aus === 1 ? " vez" : " veces") : "";
-    return '<div class="row"><i style="background:var(--' + (o.turnos ? "par" : "fdt") + '-dot)"></i><b>' + h(o.n) + '</b>' +
-      '<small>' + (o.turnos ? o.turnos + (o.turnos === 1 ? " turno" : " turnos") + " en " + k.nClases + (k.nClases === 1 ? " clase" : " clases") : "sin participar en todo el periodo") + falt + '</small></div>';
+    return '<button type="button" class="row" data-act="ver-est" data-id="' + o.id + '">' +
+      '<i style="background:var(--' + (o.turnos ? "par" : "fdt") + '-dot)"></i>' +
+      '<span class="grow"><b>' + h(o.n) + '</b>' +
+      '<small>' + (o.turnos ? o.turnos + (o.turnos === 1 ? " turno" : " turnos") + " en " + k.nClases + (k.nClases === 1 ? " clase" : " clases") : "sin participar en todo el periodo") + falt +
+      ' · último turno ' + haceCuanto(o.ultimo) + '</small></span><span class="chev">›</span></button>';
   }).join("");
   s += '<p class="dato">El tercio más activo del curso (' + k.tercio + ' estudiantes) se lleva el <b>' + k.concTurnos + '%</b> de los turnos. Si fuera parejo sería 33%.</p>' +
     '<div class="meter"><i style="width:' + k.concTurnos + '%;background:var(--par-dot)"></i></div></section>';
@@ -2229,6 +2518,14 @@ document.addEventListener("click", function(ev){
     return;
   }
   if(act === "abrir"){ sheetAlumno = id; cerrarToast(); render(); return; }
+  if(act === "ver-est"){
+    estudianteVuelve = (vista === "clase") ? "clase" : "consolidado";
+    estudiante = id; sheetAlumno = null; modal = null; cerrarToast();
+    vista = "estudiante"; render(); window.scrollTo(0,0); return;
+  }
+  if(act === "cerrar-estudiante"){
+    vista = estudianteVuelve; estudiante = null; render(); window.scrollTo(0,0); return;
+  }
   if(act === "cerrar-hoja"){ sheetAlumno = null; render(); return; }
   if(act === "reg"){ registrar(id, t.getAttribute("data-a")); return; }
   if(act === "deshacer"){ deshacer(id); return; }
