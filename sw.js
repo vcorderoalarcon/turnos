@@ -14,14 +14,22 @@
    En las herramientas del navegador, Application → Service Workers →
    marcar "Update on reload". */
 
-var CACHE = "turnos-v2";
+var CACHE = "turnos-v5";
 var ARCHIVOS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./icono-192.png",
   "./icono-512.png",
-  "./icono-180.png"
+  "./icono-180.png",
+  "./icono-maskable-192.png",
+  "./icono-maskable-512.png",
+  "./lora-600.woff2",
+  "./lora-700.woff2",
+  "./ws-400.woff2",
+  "./ws-500.woff2",
+  "./ws-600.woff2",
+  "./ws-700.woff2"
 ];
 
 self.addEventListener("install", function (e) {

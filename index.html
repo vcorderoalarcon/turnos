@@ -16,8 +16,14 @@ img { max-width: 100%; }
 <meta name="apple-mobile-web-app-title" content="Turnos">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="icono-180.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500..700&display=swap" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400..700&display=swap" media="print" onload="this.media='all'">
+<style>
+@font-face{font-family:Lora;src:url(lora-600.woff2)format('woff2');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:Lora;src:url(lora-700.woff2)format('woff2');font-weight:700 800;font-style:normal;font-display:swap}
+@font-face{font-family:'Work Sans';src:url(ws-400.woff2)format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Work Sans';src:url(ws-500.woff2)format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Work Sans';src:url(ws-600.woff2)format('woff2');font-weight:600 650;font-style:normal;font-display:swap}
+@font-face{font-family:'Work Sans';src:url(ws-700.woff2)format('woff2');font-weight:700 800;font-style:normal;font-display:swap}
+</style>
 <style>
 /* Layout: una columna en el teléfono, cabecera fija con la fase, grilla del curso de 4 columnas,
    hoja de acciones por familia, y una vista aparte de ancho completo para proyectar. */
@@ -356,6 +362,22 @@ textarea{ min-height:110px; resize:vertical; line-height:1.45; font-family:ui-mo
 .inicio-foot{ display:flex; flex-direction:column; align-items:center; gap:2px; margin-top:2px; }
 .inicio-foot small{ font-size:11.5px; color:var(--fg-3); letter-spacing:.03em; }
 
+/* ---------- grupos en el mapa ---------- */
+.pincel{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:11px; }
+.pincel button{ min-height:40px; min-width:40px; padding:0 11px; border-radius:11px; border:1.5px solid var(--line);
+  background:var(--surface); font:inherit; font-size:13px; font-weight:700; color:var(--fg); cursor:pointer; }
+.pincel button[aria-pressed="true"]{ border-width:2.5px; }
+.pincel button .pt{ display:inline-block; width:9px; height:9px; border-radius:999px; margin-right:6px; vertical-align:middle; }
+.seat .gnum{ position:absolute; bottom:4px; right:4px; min-width:18px; height:18px; padding:0 4px; border-radius:999px;
+  display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:800; border:1px solid; }
+.gfila{ display:flex; align-items:baseline; gap:9px; padding:9px 0; border-top:1px solid var(--line); }
+.gfila:first-of-type{ border-top:0; }
+.gfila .gpt{ flex:none; width:10px; height:10px; border-radius:999px; margin-top:4px; }
+.gfila .gcuerpo{ flex:1; min-width:0; }
+.gfila b{ font-size:13px; }
+.gfila small{ display:block; font-size:11.5px; color:var(--fg-2); line-height:1.4; margin-top:2px; }
+.gfila .gnum2{ flex:none; font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
+
 /* ---------- resumen por estudiante ---------- */
 .est-cab{ display:flex; flex-direction:column; gap:3px; }
 .est-cab h2{ margin:0; font-family:var(--display); font-size:clamp(23px,6.6vw,28px); font-weight:600; line-height:1.15; color:var(--par-ink); }
@@ -476,6 +498,7 @@ var ACCIONES = [
 
   {id:"e-explica",    f:"pares", t:"Le explica a un compañero",      s:1, explica:true},
   {id:"e-pide-exp",   f:"pares", t:"Le pide que le explique",        s:1},
+  {id:"e-sin-resp",   f:"pares", t:"Pide ayuda y nadie le responde", s:-1},
   {id:"e-da-resp",    f:"pares", t:"Le da la respuesta",             s:0},
   {id:"e-pide-resp",  f:"pares", t:"Le pide la respuesta",           s:0},
   {id:"e-aplica",     f:"pares", t:"Usa la ayuda que le dieron",     s:1},
@@ -525,6 +548,8 @@ var barrido = null;
 var modoAusentes = false;
 var sorteo = null;
 var estudiante = null;
+var modoSala = "puestos";
+var pincelGrupo = 1;
 var estudianteVuelve = "consolidado";
 
 function nuevoDB(){
@@ -680,6 +705,36 @@ function asientoDe(c, aid){
   for(var i = 0; i < ks.length; i++){ if(s.asientos[ks[i]] === aid) return ks[i]; }
   return "";
 }
+/* Los grupos viven en el puesto, no en el estudiante: un grupo es un
+   conjunto de mesas. Si alguien se cambia de puesto, entra al grupo de
+   ese puesto, que es lo que pasa en la realidad. */
+var GRUPO_TOK = ["par","pares","doc","fdt"];
+var MAX_GRUPOS = 8;
+function grupoCorte(n){ return n > GRUPO_TOK.length; }
+function gruposDe(c){ var s = salaDe(c); return (s && s.grupos) || {}; }
+function grupoDe(c, aid){ var k = asientoDe(c, aid); return k ? (gruposDe(c)[k] || 0) : 0; }
+function grupoTok(n){ return GRUPO_TOK[(n - 1) % GRUPO_TOK.length]; }
+function nGrupos(c){
+  var g = gruposDe(c), m = 0;
+  Object.keys(g).forEach(function(k){ if(g[k] > m) m = g[k]; });
+  return m;
+}
+function puntoGrupo(n){
+  var tok = grupoTok(n);
+  return grupoCorte(n)
+    ? '<i class="gpt" style="border:2.5px solid var(--' + tok + '-dot)"></i>'
+    : '<i class="gpt" style="background:var(--' + tok + '-dot)"></i>';
+}
+function integrantes(c, n){
+  var sa = salaDe(c); if(!sa) return [];
+  var g = gruposDe(c), out = [];
+  Object.keys(g).forEach(function(k){
+    if(g[k] !== n) return;
+    var a = alumno(c, (sa.asientos || {})[k]);
+    if(a) out.push(a);
+  });
+  return out;
+}
 function sinPuesto(c){
   var s = salaDe(c); if(!s) return alumnosDe(c);
   var ocupados = {};
@@ -763,7 +818,8 @@ function registrar(alumnoId, accionId){
   var c = curso(); var cl = asegurarClase(); if(!c || !cl) return;
   var a = ACC_BY_ID[accionId];
   var r = { id:uid(), cursoId:c.id, claseId:cl.id, alumnoId:alumnoId, accionId:accionId,
-            fase:cl.fase, grupal:!!cl.grupal, asiento:asientoDe(c, alumnoId), ts:Date.now(), nota:"" };
+            fase:cl.fase, grupal:!!cl.grupal, asiento:asientoDe(c, alumnoId),
+            grupo:grupoDe(c, alumnoId), ts:Date.now(), nota:"" };
   DB.registros.push(r); guardar();
   sheetAlumno = null;
   var nom = corto((alumno(c, alumnoId) || {}).nombre || "");
@@ -842,7 +898,7 @@ function etiqueta(id, def){ return (DB.config.etiquetas && DB.config.etiquetas[i
 
 /* ========== exportación ========== */
 function csv(){
-  var filas = [["tipo_registro","curso","fecha","hora","fase","estudiante","familia","accion","tipo_participacion","tipo_fuera_tarea","trabajo_grupal","signo","nota"]];
+  var filas = [["tipo_registro","curso","fecha","hora","fase","estudiante","familia","accion","tipo_participacion","tipo_fuera_tarea","trabajo_grupal","grupo","signo","nota"]];
   function nombreFase(id){ var f = FASES.filter(function(x){ return x.id === id; })[0]; return f ? f.t : ""; }
   DB.registros.slice().sort(function(a,b){ return a.ts - b.ts; }).forEach(function(r){
     var c = DB.cursos.filter(function(x){ return x.id === r.cursoId; })[0];
@@ -850,13 +906,13 @@ function csv(){
     var cl = DB.clases.filter(function(x){ return x.id === r.claseId; })[0];
     var a = ACC_BY_ID[r.accionId]; if(!a) return;
     filas.push([ "interaccion", c?c.nombre:"", cl?cl.fecha:"", hora(r.ts), nombreFase(r.fase), al?al.nombre:"",
-      FAM_BY_ID[a.f].t, a.t, a.k||"", a.boss||"", r.grupal?"sí":"no", a.s>0?"+":(a.s<0?"-":"0"), r.nota||"" ]);
+      FAM_BY_ID[a.f].t, a.t, a.k||"", a.boss||"", r.grupal?"sí":"no", r.grupo||"", a.s>0?"+":(a.s<0?"-":"0"), r.nota||"" ]);
   });
   DB.clases.slice().sort(function(a,b){ return a.ts - b.ts; }).forEach(function(cl){
     var cc = DB.cursos.filter(function(x){ return x.id === cl.cursoId; })[0];
     Object.keys(ausentesDe(cl)).forEach(function(aid){
       var al = cc ? alumno(cc, aid) : null;
-      filas.push([ "ausencia", cc?cc.nombre:"", cl.fecha, "", "", al?al.nombre:"", "Asistencia", "Ausente", "", "", "", "", "" ]);
+      filas.push([ "ausencia", cc?cc.nombre:"", cl.fecha, "", "", al?al.nombre:"", "Asistencia", "Ausente", "", "", "", "", "", "" ]);
     });
   });
   DB.barridos.slice().sort(function(a,b){ return a.ts - b.ts; }).forEach(function(b){
@@ -1190,19 +1246,65 @@ function vistaSala(c){
     '<button type="button" class="btn sm ghost" data-act="sala-llenar">Llenar en orden de lista</button>' +
     '<button type="button" class="btn sm ghost" data-act="sala-vaciar">Vaciar todo</button></div></section>';
 
-  s += '<section class="card"><h3>Puestos</h3><div class="sub">Toca un puesto para asignar o cambiar al estudiante</div>' +
-    '<div class="sala-scroll"><div class="sala-grid" style="grid-template-columns:repeat(' + sala.cols + ',minmax(58px,1fr))">';
+  var esGrupos = modoSala === "grupos";
+  var gr = sala.grupos || {};
+
+  s += '<section class="card"><h3>' + (esGrupos ? "Grupos" : "Puestos") + '</h3>' +
+    '<div class="sub">' + (esGrupos
+      ? "Elige un grupo y toca los puestos que lo forman"
+      : "Toca un puesto para asignar o cambiar al estudiante") + '</div>';
+
+  s += '<div class="seg" role="group" aria-label="Qué estás editando" style="margin-bottom:12px">' +
+    '<button type="button" aria-pressed="' + (esGrupos ? "false" : "true") + '" data-act="sala-modo" data-m="puestos">Estudiantes</button>' +
+    '<button type="button" aria-pressed="' + (esGrupos ? "true" : "false") + '" data-act="sala-modo" data-m="grupos">Grupos</button></div>';
+
+  if(esGrupos){
+    s += '<div class="pincel" role="group" aria-label="Grupo a pintar">';
+    for(var gi = 1; gi <= MAX_GRUPOS; gi++){
+      s += '<button type="button" aria-pressed="' + (pincelGrupo === gi ? "true" : "false") + '" data-act="sala-pincel" data-g="' + gi + '"' +
+        ' style="border-color:var(--' + grupoTok(gi) + '-dot);border-style:' + (grupoCorte(gi) ? "dashed" : "solid") + (pincelGrupo === gi ? '' : ';opacity:.62') + '">' +
+        '<i class="pt" style="background:var(--' + grupoTok(gi) + '-dot)"></i>' + gi + '</button>';
+    }
+    s += '<button type="button" aria-pressed="' + (pincelGrupo === 0 ? "true" : "false") + '" data-act="sala-pincel" data-g="0">Sin grupo</button>';
+    s += '</div>';
+  }
+
+  s += '<div class="sala-scroll"><div class="sala-grid" style="grid-template-columns:repeat(' + sala.cols + ',minmax(58px,1fr))">';
   for(var fi = sala.filas - 1; fi >= 0; fi--){
     for(var ci = 0; ci < sala.cols; ci++){
       var key = fi + "-" + ci;
       var aid = (sala.asientos || {})[key];
       var al = aid ? alumno(c, aid) : null;
-      s += '<button type="button" class="seat' + (al ? "" : " vacio") + '" data-act="sala-puesto" data-k="' + key + '">' +
+      var g = gr[key] || 0;
+      var tok = g ? grupoTok(g) : null;
+      s += '<button type="button" class="seat' + (al ? "" : " vacio") + (g ? " congrupo" : "") + '" data-act="sala-puesto" data-k="' + key + '"' +
+        (tok ? ' style="border-color:var(--' + tok + '-dot);border-width:2px;border-style:' + (grupoCorte(g) ? "dashed" : "solid") + '"' : '') + '>' +
         (al ? '<b>' + h(corto(al.nombre)) + '</b>' : '<span>' + (fi+1) + '·' + (ci+1) + '</span>') +
-        (al ? '<span class="pos">' + (fi+1) + '·' + (ci+1) + '</span>' : '') + '</button>';
+        (al ? '<span class="pos">' + (fi+1) + '·' + (ci+1) + '</span>' : '') +
+        (g ? '<span class="gnum" style="background:var(--' + tok + '-wash);color:var(--' + tok + '-ink);border-color:var(--' + tok + '-dot)">' + g + '</span>' : '') + '</button>';
     }
   }
-  s += '</div></div><div class="pizarra">Pizarra</div></section>';
+  s += '</div></div><div class="pizarra">Pizarra</div>';
+
+  if(esGrupos){
+    var ng = nGrupos(c);
+    if(ng){
+      s += '<div style="margin-top:12px">';
+      for(var gj = 1; gj <= ng; gj++){
+        var ints = integrantes(c, gj);
+        if(!ints.length) continue;
+        s += '<div class="gfila">' + puntoGrupo(gj) +
+          '<div class="gcuerpo"><b>Grupo ' + gj + '</b><small>' +
+          h(ints.map(function(a){ return corto(a.nombre); }).join(" · ")) + '</small></div>' +
+          '<span class="gnum2">' + ints.length + '</span></div>';
+      }
+      s += '</div><div class="btn-row" style="margin-top:12px">' +
+        '<button type="button" class="btn sm ghost" data-act="sala-limpiar-grupos">Deshacer todos los grupos</button></div>';
+    } else {
+      s += '<p class="dato" style="margin-top:12px">Todavía no hay grupos. Elige el 1, toca sus puestos, y sigue con el 2.</p>';
+    }
+  }
+  s += '</section>';
 
   if(sp.length){
     s += '<section class="card"><h3>Sin puesto · ' + sp.length + '</h3>' +
@@ -1210,7 +1312,7 @@ function vistaSala(c){
       '<div class="chips">' + sp.map(function(a){ return '<span class="chip-n">' + h(corto(a.nombre)) + '</span>'; }).join("") + '</div></section>';
   }
 
-  s += '<div class="aviso">' + iconoInfo() + '<span>Cada registro guarda el puesto del momento, así que puedes reordenar la sala cuando quieras sin que se corrompa el historial.</span></div>';
+  s += '<div class="aviso">' + iconoInfo() + '<span>Cada registro guarda el puesto y el grupo del momento, así que puedes reordenar la sala cuando quieras sin que se corrompa el historial.</span></div>';
   s += '</div></div>';
   return s;
 }
@@ -1499,8 +1601,9 @@ function vistaEstudiante(c){
   s += '<div class="aviso">' + iconoInfo() + '<span><b>Pantalla privada: no la proyectes.</b> Y los conteos dependen de cuánto alcanzaste a registrar: un cero puede ser que no ocurrió o que no lo viste.</span></div>';
 
   // 1 · Lo esencial
+  var gAl = grupoDe(c, estudiante);
   s += '<section class="est-tar"><div class="est-cab"><h2>' + h(corto(al.nombre)) + '</h2>' +
-    '<small>' + h(al.nombre) + '</small></div>' +
+    '<small>' + h(al.nombre) + (gAl ? ' · grupo ' + gAl : '') + '</small></div>' +
     '<div class="stats" style="margin-top:12px">' +
     stat(d.regs.length, "interacciones registradas", "par") +
     stat(ultimoCorto(d.ultimoPar).v, ultimoCorto(d.ultimoPar).t, d.ultimoPar ? "ok" : "fdt") +
@@ -1570,6 +1673,7 @@ function vistaEstudiante(c){
   if((cu["e-pide-exp"]||0) > (cu["e-pide-resp"]||0)) pares.push("Pide explicación, no la respuesta.");
   if(cu["e-aplica"]) pares.push("Aplicó a su propia tarea la ayuda que recibió " + cu["e-aplica"] + (cu["e-aplica"] === 1 ? " vez" : " veces") + ". Es el mejor predictor de aprendizaje que tiene este instrumento.");
   if((cu["e-explica"]||0) > 0 && (cu["e-da-resp"]||0) === 0) pares.push("Cuando ayuda, explica: nunca registraste que pasara la respuesta sin más.");
+  if(cu["e-sin-resp"]) pares.push("Pidió ayuda y no se la dieron " + cu["e-sin-resp"] + (cu["e-sin-resp"] === 1 ? " vez" : " veces") + ". Es la interacción que en Webb (1982) más se relacionó con el rendimiento, en sentido negativo.");
   if(pares.length) s += nota(pares.join(" "));
   s += '</section>';
 
@@ -1652,7 +1756,7 @@ function consolidar(c, p){
   var A = {};
   alumnosDe(c).forEach(function(a){
     A[a.id] = { id:a.id, n:corto(a.nombre), vol:0, llam:0, fdt:0, motor:0, verbal:0, pasivo:0,
-                noIni:0, noResp:0, aten:0, explica:0, daResp:0, aplica:0, total:0, acc:{},
+                noIni:0, noResp:0, aten:0, explica:0, daResp:0, aplica:0, sinResp:0, total:0, acc:{},
                 bar:{ ok:0, err:0, av:0, no:0, tot:0 }, aus:0 };
   });
   var clasesPeriodo = DB.clases.filter(function(x){ return x.cursoId === c.id && x.ts >= r.desde; });
@@ -1671,7 +1775,7 @@ function consolidar(c, p){
       o.bar[e]++; o.bar.tot++; barTot[e]++;
     });
   });
-  var elogEsp = 0, elogGen = 0, norma = 0, fasesFdt = {}, totExplica = 0, totDaResp = 0, totAplica = 0;
+  var elogEsp = 0, elogGen = 0, norma = 0, fasesFdt = {}, totExplica = 0, totDaResp = 0, totAplica = 0, totSinResp = 0;
   regs.forEach(function(x){
     var a = ACC_BY_ID[x.accionId], o = A[x.alumnoId];
     if(!a || !o) return;
@@ -1688,6 +1792,7 @@ function consolidar(c, p){
     if(x.accionId === "e-explica"){ o.explica++; totExplica++; }
     if(x.accionId === "e-da-resp"){ o.daResp++; totDaResp++; }
     if(x.accionId === "e-aplica"){ o.aplica++; totAplica++; }
+    if(x.accionId === "e-sin-resp"){ o.sinResp++; totSinResp++; }
   });
   /* El "hace cuánto" se mide contra todo el historial, no contra el periodo:
      que no haya participado esta semana no dice si fue ayer o hace un mes. */
@@ -1712,7 +1817,7 @@ function consolidar(c, p){
     concLlam:concLlam, tercio:tercio, nuncaLlamados:arr.filter(function(o){ return !o.llam; }),
     elogEsp:elogEsp, elogGen:elogGen, norma:norma, faseTop:faseTop, fasesFdt:fasesFdt,
     totFdt:arr.reduce(function(s,o){ return s + o.fdt; }, 0),
-    totExplica:totExplica, totDaResp:totDaResp, totAplica:totAplica,
+    totExplica:totExplica, totDaResp:totDaResp, totAplica:totAplica, totSinResp:totSinResp,
     barridos:barridos, barTot:barTot, totalAusencias:totalAusencias, nClasesPeriodo:clasesPeriodo.length
   };
 }
@@ -1817,13 +1922,20 @@ function vistaConsolidado(c){
       if(o.explica) d.push(o.explica + " explica");
       if(o.daResp) d.push(o.daResp + " pasa la respuesta");
       if(o.aplica) d.push(o.aplica + " usa la ayuda recibida");
+      if(o.sinResp) d.push(o.sinResp + " pide y no le responden");
       return { n:o.n, v:o.explica + o.aplica, d:d.join(" · ") };
     }), "pares");
+  if(k.totSinResp){
+    s += '<p class="dato"><b>' + k.totSinResp + (k.totSinResp === 1 ? " vez" : " veces") + '</b> alguien pidió ayuda a un compañero y no se la dieron. ' +
+      'En Webb (1982), de las interacciones medidas en cuatro salas de matemática, esa fue la que más se relacionó con el rendimiento, y en sentido negativo.</p>';
+  }
   if(k.totExplica + k.totDaResp){
     s += '<p class="dato">En el curso hubo <b>' + k.totExplica + '</b> explicaciones contra <b>' + k.totDaResp + '</b> respuestas pasadas sin explicar. ' +
       'La evidencia dice que quien explica con elaboración es el que más aprende, y que el que recibe solo gana si aplica la ayuda: eso pasó <b>' + k.totAplica + '</b> veces.</p>';
   }
   s += '</section>';
+
+  s += seccionGrupos(c, k);
 
   s += '<section class="card"><h3>Tu práctica</h3><div class="sub">Esto no mide a los estudiantes, te mide a ti</div>' +
     barras([
@@ -1851,6 +1963,70 @@ function vistaConsolidado(c){
 
 function iconoInfo(){
   return '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.6" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.6v4.2M8 11.1v.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+}
+
+/* Trabajo en grupo. El dato que manda acá es "pide ayuda y nadie le
+   responde": en Webb (1982), de las interacciones estudiadas en cuatro
+   salas de matemática, fue la que más se relacionó con el rendimiento,
+   y en sentido negativo. */
+function seccionGrupos(c, k){
+  var ng = nGrupos(c);
+  if(!ng) return "";
+  var r = rangoPeriodo(periodo);
+  var gr = gruposDe(c);
+  var G = {};
+  for(var i = 1; i <= ng; i++){
+    var ints = integrantes(c, i);
+    if(ints.length) G[i] = { n:i, ints:ints, explica:0, daResp:0, sinResp:0, pideExp:0, aplica:0, fdt:0, tot:0 };
+  }
+  var claves = Object.keys(G);
+  if(!claves.length) return "";
+
+  DB.registros.forEach(function(x){
+    if(x.cursoId !== c.id || x.ts < r.desde) return;
+    var g = x.grupo || gr[x.asiento || asientoDe(c, x.alumnoId)] || 0;
+    var o = G[g]; if(!o) return;
+    var a = ACC_BY_ID[x.accionId]; if(!a) return;
+    o.tot++;
+    if(a.f === "fdt") o.fdt++;
+    if(x.accionId === "e-explica")   o.explica++;
+    if(x.accionId === "e-da-resp")   o.daResp++;
+    if(x.accionId === "e-sin-resp")  o.sinResp++;
+    if(x.accionId === "e-pide-exp")  o.pideExp++;
+    if(x.accionId === "e-aplica")    o.aplica++;
+  });
+
+  var arr = claves.map(function(x){ return G[x]; });
+  var totSinResp = arr.reduce(function(t,o){ return t + o.sinResp; }, 0);
+
+  var s = '<section class="card" id="grupos"><h3>Trabajo en grupo</h3>' +
+    '<div class="sub">' + arr.length + (arr.length === 1 ? " grupo armado" : " grupos armados") + ' en el mapa de la sala</div>';
+
+  s += arr.map(function(o){
+    var d = [];
+    if(o.explica)  d.push(o.explica + (o.explica === 1 ? " explicación" : " explicaciones"));
+    if(o.daResp)   d.push(o.daResp + (o.daResp === 1 ? " vez pasaron la respuesta sin explicar" : " veces pasaron la respuesta sin explicar"));
+    if(o.aplica)   d.push(o.aplica + (o.aplica === 1 ? " vez usaron la ayuda recibida" : " veces usaron la ayuda recibida"));
+    if(o.sinResp)  d.push("<b style=\'color:var(--orange-ink)\'>" + o.sinResp + (o.sinResp === 1 ? " pedido de ayuda sin respuesta" : " pedidos de ayuda sin respuesta") + "</b>");
+    if(o.fdt)      d.push(o.fdt + " fuera de tarea");
+    return '<div class="gfila">' + puntoGrupo(o.n) +
+      '<div class="gcuerpo"><b>Grupo ' + o.n + ' · ' + o.ints.length + '</b>' +
+      '<small>' + h(o.ints.map(function(a){ return corto(a.nombre); }).join(" · ")) + '</small>' +
+      '<small>' + (d.length ? d.join(" · ") : "Sin registros en el periodo") + '</small></div>' +
+      '<span class="gnum2">' + o.tot + '</span></div>';
+  }).join("");
+
+  if(totSinResp){
+    var peor = arr.slice().sort(function(a,b){ return b.sinResp - a.sinResp; })[0];
+    s += '<p class="dato"><b>' + totSinResp + (totSinResp === 1 ? " vez" : " veces") + '</b> alguien pidió ayuda y no se la dieron' +
+      (peor.sinResp > 1 ? ', ' + peor.sinResp + ' de ellas en el <b>grupo ' + peor.n + '</b>' : '') + '. ' +
+      'En Webb (1982), de las interacciones medidas en cuatro salas de matemática, esa fue la que más se relacionó con el rendimiento, y en sentido negativo.</p>';
+  }
+
+  s += '<div class="aviso" style="margin-top:13px">' + iconoInfo() +
+    '<span><b>El grupo dice quiénes estaban sentados juntos, no quién le habló a quién.</b> ' +
+    'Si alguien explicó, la app sabe que explicó y en qué grupo estaba; no sabe a quién.</span></div>';
+  return s + '</section>';
 }
 
 function seccionSala(c, k){
@@ -2531,16 +2707,31 @@ document.addEventListener("click", function(ev){
   if(act === "deshacer"){ deshacer(id); return; }
   if(act === "cerrar-aviso"){ avisoRespaldo = false; render(); return; }
   if(act === "periodo"){ periodo = t.getAttribute("data-p"); render(); window.scrollTo(0,0); return; }
+  if(act === "sala-modo"){ modoSala = t.getAttribute("data-m"); render(); return; }
+  if(act === "sala-pincel"){ pincelGrupo = +t.getAttribute("data-g"); render(); return; }
+  if(act === "sala-limpiar-grupos"){
+    if(c && c.sala){ c.sala.grupos = {}; guardar(); }
+    render(); return;
+  }
   if(act === "modo-lista"){ DB.config.vistaSala = false; guardar(); render(); return; }
   if(act === "modo-sala"){ DB.config.vistaSala = true; guardar(); render(); return; }
+  if(act === "sala-puesto" && modoSala === "grupos"){
+    c.sala = c.sala || { filas:5, cols:6, asientos:{} };
+    c.sala.grupos = c.sala.grupos || {};
+    var kg = t.getAttribute("data-k");
+    if(pincelGrupo) c.sala.grupos[kg] = pincelGrupo; else delete c.sala.grupos[kg];
+    guardar(); render(); return;
+  }
   if(act === "sala-mas" || act === "sala-menos"){
     c.sala = c.sala || { filas:5, cols:6, asientos:{} };
     var campo = t.getAttribute("data-k");
     var d = act === "sala-mas" ? 1 : -1;
     c.sala[campo] = Math.max(1, Math.min(12, c.sala[campo] + d));
-    Object.keys(c.sala.asientos).forEach(function(k){
-      var p = k.split("-");
-      if(+p[0] >= c.sala.filas || +p[1] >= c.sala.cols) delete c.sala.asientos[k];
+    [c.sala.asientos, c.sala.grupos || {}].forEach(function(mapa){
+      Object.keys(mapa).forEach(function(k){
+        var p = k.split("-");
+        if(+p[0] >= c.sala.filas || +p[1] >= c.sala.cols) delete mapa[k];
+      });
     });
     guardar(); render(); return;
   }

@@ -1,18 +1,86 @@
 {
+  "id": "/turnos/",
   "name": "Turnos · Registro de interacciones de aula",
   "short_name": "Turnos",
-  "description": "Registro de participación e interacciones de aula. Desarrollada por Savia Educa.",
+  "description": "Registra con un toque la participación y las interacciones de tu sala de clases. Funciona sin conexión y los datos quedan en tu teléfono. Desarrollada por Savia Educa.",
   "lang": "es-CL",
   "dir": "ltr",
+  "categories": [
+    "education",
+    "productivity"
+  ],
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "portrait",
   "background_color": "#FBFAF7",
   "theme_color": "#0F4634",
+  "prefer_related_applications": false,
   "icons": [
-    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icono-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icono-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icono-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icono-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "captura-2-clase.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "La lista del curso durante la clase"
+    },
+    {
+      "src": "captura-3-registrar.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Registrar una interacción con un toque"
+    },
+    {
+      "src": "captura-5-estudiante.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Resumen de un estudiante"
+    },
+    {
+      "src": "captura-4-consolidado.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Consolidado del periodo"
+    },
+    {
+      "src": "captura-6-grupos.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Grupos en el mapa de la sala"
+    }
   ]
 }
